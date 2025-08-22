@@ -25,6 +25,17 @@ To install Sisypus on your system after building it you can do so by executing t
 cmake --install <BUILD_DIR>
 ```
 
+## Linking
+To link the library using cmake after you've installed the library on your system you can directly use `find_package()` and link your target to `Sisyphus::Sisyphus`
+
+```cmake
+find_package(Sisyphus REQUIRED)
+
+...
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Sisyphus::Sisyphus)
+```
+
 ## Additional notes
 This project is a side project from [Anta](https://bsky.app/profile/traveler-anta.bsky.social) it's mainly used to have fun, learn a lot and having a big puzzle to solve.
 Some of the code could be (there is a high chance) inefficient or unconventionnal, if you have any suggestion I'll be really pleased to hear them, it could help a little apprentice developper in his journey.

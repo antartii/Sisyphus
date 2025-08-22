@@ -28,7 +28,7 @@ We do not use pre-release version or fancy wording/characters, only straight num
 
 ### Changing version in the code
 In the code there is a few things to change in order to update the new version, so make sure you update the following :
-- `\CMakeLists.txt` : inside of project(), change the number version after VERSION to the new version of the release
+- `\CMakeLists.txt` : inside of project(), change the number version after `VERSION `to the new version of the release. You should also change the latest version still compatible with your changes under the variable `COMPAT_VERSION`.
 
 ## Documenting
 Another thing to consider when starting a new release is the documentation, remember that the documentation will help both other developpers to understand your code but also yourself in the future.
