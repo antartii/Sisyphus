@@ -20,8 +20,13 @@ configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
 set(SURFACE "wayland" CACHE STRING "Select your surface api" ) # Linux specific
 
 # === Create the target ===
+set(SISYPHUS_PREFIX "sisyphus")
+
 add_library(${PROJECT_NAME}
-    ${PROJECT_SOURCE_DIR}/src/sisyphus.c
+    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}.c
+    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}_engine.c
+    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}_renderer.c
+    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}_window.c
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
