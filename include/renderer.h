@@ -9,23 +9,19 @@
 #include "sisyphus_config.h"
 #include "utils.h"
 #include "errors.h"
+#include "string.h"
 
 #define SSP_VULKAN_API_VERSION VK_API_VERSION_1_0
 
-typedef void (*SSPRendererErrorHandlerCallback)(void *, int, enum SSP_ERROR_SEVERITY);
-
-struct SSPRendererErrorHandler {
-    bool destroy;
-    SSPRendererErrorHandlerCallback callback;
-    enum SSP_ERROR_SEVERITY min_severity;
-    void *data;
+struct SSPVulkanContext {
+    VkInstance instance;
 };
 
 struct SSPRenderer {
-    struct SSPRendererErrorHandler error_handler;
+    struct SSPVulkanContext vulkan_context;
 };
 
-struct SSPRenderer *SSPRenderer_create(void);
-void SSPRenderer_destroy(struct SSPRenderer *renderer);
+enum SSP_ERROR_CODE ssp_renderer_create(struct SSPRenderer *pRenderer, const char *app_name, const struct Version app_version);
+void ssp_renderer_destroy(struct SSPRenderer *pRenderer);
 
 #endif

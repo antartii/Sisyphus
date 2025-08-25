@@ -9,6 +9,6 @@
 /**
  * @brief Printing in stdout the version, the description, and the current surface used by the Sisyphus library
  */
-void SSPlibrary_print_info(void);
+void ssp_library_print_info(void);
 
 #endif

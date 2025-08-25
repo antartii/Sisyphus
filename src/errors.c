@@ -6,7 +6,7 @@ const char *SSP_ERROR_STR[] = {
     #undef X
 };
 
-enum SSP_ERROR_SEVERITY SSPget_error_severity(enum SSP_ERROR_CODE code)
+enum SSP_ERROR_SEVERITY ssp_get_error_severity(enum SSP_ERROR_CODE code)
 {
     switch (code) {
         #define X(code, str, severity) case code: return severity;

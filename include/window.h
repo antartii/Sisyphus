@@ -2,12 +2,13 @@
 #define _SISYPHUS_WINDOW_H
 
 #include <stdlib.h>
+#include "errors.h"
 
 struct SSPWindow {
 
 };
 
-struct SSPWindow *SSPWindow_create(void);
-void SSPWindow_destroy(struct SSPWindow *window);
+enum SSP_ERROR_CODE ssp_window_create(struct SSPWindow *pWindow);
+void ssp_window_destroy(struct SSPWindow *pWindow);
 
 #endif

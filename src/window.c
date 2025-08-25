@@ -1,13 +1,11 @@
 #include "window.h"
 
-struct SSPWindow *SSPWindow_create(void)
+enum SSP_ERROR_CODE ssp_window_create(struct SSPWindow *pWindow)
 {
-    struct SSPWindow *window = calloc(1, sizeof(struct SSPWindow));
-
-    return window;
+    return SSP_ERROR_CODE_SUCCESS;
 }
 
-void SSPWindow_destroy(struct SSPWindow *window)
+void ssp_window_destroy(struct SSPWindow *pWindow)
 {
-    free(window);
+    free(pWindow);
 }
