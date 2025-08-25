@@ -1,4 +1,4 @@
-#include "sisyphus_window.h"
+#include "window.h"
 
 struct SSPWindow *SSPWindow_create(void)
 {

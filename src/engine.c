@@ -1,4 +1,4 @@
-#include "sisyphus_engine.h"
+#include "engine.h"
 
 struct SSPEngine *SSPEngine_create(void)
 {

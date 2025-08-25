@@ -14,22 +14,30 @@ set(COMPAT_VERSION 0.1.0)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+set(ENGINE_NAME ${PROJECT_NAME})
+
 configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
 
 # === Options ===
 set(SURFACE "wayland" CACHE STRING "Select your surface api" ) # Linux specific
 
-# === Create the target ===
-set(SISYPHUS_PREFIX "sisyphus")
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_compile_definitions(DEBUG)
+endif()
 
+# === Create the target ===
 add_library(${PROJECT_NAME}
-    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}.c
-    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}_engine.c
-    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}_renderer.c
-    ${PROJECT_SOURCE_DIR}/src/${SISYPHUS_PREFIX}_window.c
+    ${PROJECT_SOURCE_DIR}/src/sisyphus.c
+    ${PROJECT_SOURCE_DIR}/src/engine.c
+    ${PROJECT_SOURCE_DIR}/src/renderer.c
+    ${PROJECT_SOURCE_DIR}/src/window.c
+    ${PROJECT_SOURCE_DIR}/src/errors.c
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+find_package(Vulkan REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

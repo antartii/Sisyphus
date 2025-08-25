@@ -1,8 +1,8 @@
 #ifndef _SISYPHUS_ENGINE_H
 #define _SISYPHUS_ENGINE_H
 
-#include "sisyphus_renderer.h"
-#include "sisyphus_window.h"
+#include "renderer.h"
+#include "window.h"
 
 #include <stdlib.h>
 
