@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <inttypes.h>
 #include <vulkan/vulkan.h>
+#include <unistd.h>
 
 #include "sisyphus_config.h"
 #include "utils.h"
@@ -13,8 +15,27 @@
 
 #define SSP_VULKAN_API_VERSION VK_API_VERSION_1_0
 
+struct SSPVulkanContextExtFunc {
+    PFN_vkCreateInstance vkCreateInstance;
+    PFN_vkEnumerateInstanceVersion vkEnumerateInstanceVersion;
+    PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties;
+    PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;
+
+    #ifdef DEBUG
+    PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
+    PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
+    #endif
+    PFN_vkDestroyInstance vkDestroyInstance;
+};
+
 struct SSPVulkanContext {
     VkInstance instance;
+
+    #ifdef DEBUG
+    VkDebugUtilsMessengerEXT debug_messenger;
+    #endif
+
+    struct SSPVulkanContextExtFunc ext_func;
 };
 
 struct SSPRenderer {
