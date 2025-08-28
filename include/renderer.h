@@ -20,6 +20,8 @@ struct SSPVulkanContextExtFunc {
     PFN_vkEnumerateInstanceVersion vkEnumerateInstanceVersion;
     PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties;
     PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;
+    PFN_vkEnumeratePhysicalDevices vkEnumeratePhysicalDevices;
+    PFN_vkGetPhysicalDeviceProperties vkGetPhysicalDeviceProperties; // deprecated: Vulkan 1.1
 
     #ifdef DEBUG
     PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
@@ -30,6 +32,7 @@ struct SSPVulkanContextExtFunc {
 
 struct SSPVulkanContext {
     VkInstance instance;
+    VkPhysicalDevice physical_device;
 
     #ifdef DEBUG
     VkDebugUtilsMessengerEXT debug_messenger;
