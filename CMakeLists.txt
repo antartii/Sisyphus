@@ -13,16 +13,48 @@ set(COMPAT_VERSION 0.1.0)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(ENGINE_NAME ${PROJECT_NAME})
+set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 
 configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
 
 # === Options ===
-set(SURFACE "wayland" CACHE STRING "Select your surface api" ) # Linux specific
+set(SURFACE "" CACHE STRING "Select your surface api" )
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    add_compile_definitions(DEBUG)
+if ("${SURFACE}" STREQUAL "wayland")
+    find_package(PkgConfig)
+    pkg_check_modules(PKG_WAYLAND wayland-client)
+    find_path(SURFACE_INCLUDE_DIR NAMES "wayland-client.h" HINTS ${PKG_WAYLAND_INCLUDE_DIRS})
+    find_library(SURFACE_LIBRARIES NAMES "wayland-client" HINTS ${PKG_WAYLAND_LIBRARY_DIRS})
+
+    find_program(WAYLAND_SCANNER wayland-scanner REQUIRED)
+    pkg_check_modules(WAYLAND_PROTOCOLS wayland-protocols)
+    set(WAYLAND_PROTOCOLS_DIR ${WAYLAND_PROTOCOLS_PREFIX}/share/wayland-protocols)
+    set(XDG_PROTOCOLS_XML ${WAYLAND_PROTOCOLS_DIR}/stable/xdg-shell/xdg-shell.xml)
+    set(XDG_PROTOCOLS_OUTPUT ${LIB_DIR}/wayland-protocols)
+    
+    add_custom_command(
+        OUTPUT ${XDG_PROTOCOLS_OUTPUT}/xdg-shell-protocol.c
+            ${XDG_PROTOCOLS_OUTPUT}/xdg-shell-client-protocol.h
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${XDG_PROTOCOLS_OUTPUT}
+        COMMAND ${WAYLAND_SCANNER} private-code ${XDG_PROTOCOLS_XML} ${XDG_PROTOCOLS_OUTPUT}/xdg-shell-protocol.c
+        COMMAND ${WAYLAND_SCANNER} client-header ${XDG_PROTOCOLS_XML} ${XDG_PROTOCOLS_OUTPUT}/xdg-shell-client-protocol.h
+        DEPENDS ${XDG_PROTOCOLS_XML}
+    )
+
+    set(SURFACE_SRC
+        ${PROJECT_SOURCE_DIR}/src/surfaces/wayland.c
+        ${XDG_PROTOCOLS_OUTPUT}/xdg-shell-protocol.c
+    )
+    list(APPEND SURFACE_INCLUDE_DIR ${XDG_PROTOCOLS_OUTPUT})
+else()
+    message(FATAL_ERROR "Surface invalid or not specified")
+endif()
+
+if (NOT SURFACE_INCLUDE_DIR OR NOT SURFACE_INCLUDE_DIR)
+    message(FATAL_ERROR "Libraries and/or include directory for the specified surface not found")
 endif()
 
 # === Create the target ===
@@ -32,18 +64,34 @@ add_library(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/src/renderer.c
     ${PROJECT_SOURCE_DIR}/src/window.c
     ${PROJECT_SOURCE_DIR}/src/errors.c
+    ${PROJECT_SOURCE_DIR}/src/utils.c
+    ${PROJECT_SOURCE_DIR}/src/object.c
+    ${SURFACE_SRC}
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 find_package(Vulkan REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    Vulkan::Vulkan
+    ${SURFACE_LIBRARIES}
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${SURFACE_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+
+# === Definitions ===
+if ("${SURFACE}" STREQUAL "wayland")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VK_USE_PLATFORM_WAYLAND_KHR)
+endif()
+
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC DEBUG)
+endif()
 
 # === Installing ===
 if (WIN32)

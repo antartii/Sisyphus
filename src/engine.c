@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "object.h"
 
 static void ssp_engine_error(struct SSPEngine *pEngine, enum SSP_ERROR_CODE err_code)
 {
@@ -16,29 +17,45 @@ static void ssp_engine_error(struct SSPEngine *pEngine, enum SSP_ERROR_CODE err_
         ssp_engine_destroy(pEngine);
 }
 
-static enum SSP_ERROR_CODE ssp_engine_init(struct SSPEngine *pEngine, const char *app_name, const struct Version app_version)
+bool ssp_engine_run(struct SSPEngine *pEngine)
 {
-    pEngine->renderer = calloc(1, sizeof(struct SSPRenderer));
-    pEngine->window = calloc(1, sizeof(struct SSPWindow));
+    if (!pEngine->window->should_close
+        && ssp_window_run(pEngine->window)
+        && (ssp_renderer_draw_frame(pEngine->renderer, pEngine->window) == SSP_ERROR_CODE_SUCCESS)) {
+            return true;
+    }
 
-    enum SSP_ERROR_CODE err_code = SSP_ERROR_CODE_SUCCESS;
+    ssp_renderer_stop(pEngine->renderer);
 
-    (err_code = ssp_window_create(pEngine->window))
-    || (err_code = ssp_renderer_create(pEngine->renderer, app_name, app_version));
-
-    if (err_code != SSP_ERROR_CODE_SUCCESS)
-        ssp_engine_error(pEngine, err_code);
-
-    return err_code;
+    return false;
 }
 
-struct SSPEngine *ssp_engine_create(const char *app_name, const struct Version app_version)
+struct SSPEngine *ssp_engine_create(struct SSPConfig *config, enum SSP_ERROR_CODE *error_code)
 {
     struct SSPEngine *pEngine = calloc(1, sizeof(struct SSPEngine));
 
-    if (ssp_engine_init(pEngine, app_name, app_version) != SSP_ERROR_CODE_SUCCESS)
+    pEngine->renderer = calloc(1, sizeof(struct SSPRenderer));
+    pEngine->window = calloc(1, sizeof(struct SSPWindow));
+
+    pEngine->window->width = SSP_WINDOW_DEFAULT_WIDTH;
+    pEngine->window->height = SSP_WINDOW_DEFAULT_HEIGHT;
+
+    enum SSP_ERROR_CODE err_code = SSP_ERROR_CODE_SUCCESS;
+
+    (err_code = ssp_window_create(pEngine->window, config))
+    || (err_code = ssp_renderer_create(pEngine->renderer, pEngine->window, config));
+
+    if (err_code != SSP_ERROR_CODE_SUCCESS) {
+        ssp_engine_error(pEngine, err_code);
         return NULL;
+    }
+
     return pEngine;
+}
+
+void ssp_engine_draw(struct SSPEngine *pEngine, struct SSPObject *object)
+{
+    ssp_dynamic_array_push(pEngine->renderer->objects_to_draw, object);
 }
 
 void ssp_engine_destroy(struct SSPEngine *pEngine)
@@ -46,8 +63,8 @@ void ssp_engine_destroy(struct SSPEngine *pEngine)
     if (pEngine == NULL)
         return;
 
-    ssp_window_destroy(pEngine->window);
     ssp_renderer_destroy(pEngine->renderer);
+    ssp_window_destroy(pEngine->window);
 
     free(pEngine);
 }
