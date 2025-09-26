@@ -1,5 +1,5 @@
-#ifndef _SISYPHUS_CONFIG_H
-    #define _SISYPHUS_CONFIG_H
+#ifndef _SISYPHUS_FILE_CONFIG_H
+    #define _SISYPHUS_FILE_CONFIG_H
 
     #define SSP_VERSION_MAJOR @Sisyphus_VERSION_MAJOR@ /** < Major version number of the Sisyphus library */
     #define SSP_VERSION_MINOR @Sisyphus_VERSION_MINOR@ /** < Minor version number of the Sisyphus library */
@@ -9,7 +9,7 @@
     #define SSP_HOMEPAGE_URL "@Sisyphus_HOMEPAGE_URL@" /** < Project's url of the github where the Sisyphus library is stored */
     #define SSP_SURFACE_API "@SURFACE@" /** < Surface api Sisyphus will use at runtime */
     #define SSP_ENGINE_NAME "@ENGINE_NAME@"
-    #define SSP_SHADERS_PATH "shaders/shaders.spv"
+    #define SSP_SHADERS_PATH "@SHADER_OUTPUT@"
     #define SSP_SHADER_VERTEX_ENTRY_POINT "vertMain"
     #define SSP_SHADER_FRAGMENT_ENTRY_POINT "fragMain"
 

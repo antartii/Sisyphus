@@ -18,7 +18,28 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENGINE_NAME ${PROJECT_NAME})
 set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 
-configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
+# === Compiling shaders ===
+set(SLANGC "$ENV{HOME}/VulkanSDK/1.4.309.0/x86_64/bin/slangc")
+set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/shaders.spv)
+
+add_custom_command(
+    OUTPUT ${SHADER_OUTPUT}
+    COMMAND ${SLANGC}
+            ${CMAKE_CURRENT_SOURCE_DIR}/shaders/shaders.slang
+            -target spirv
+            -profile spirv_1_4
+            -emit-spirv-directly
+            -fvk-use-entrypoint-name
+            -entry vertMain
+            -entry fragMain
+            -o ${SHADER_OUTPUT}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/shaders/shaders.slang
+    COMMENT "Compiling shaders.slang → ${SHADER_OUTPUT}"
+)
+
+add_custom_target(compile_shaders ALL
+    DEPENDS ${SHADER_OUTPUT}
+)
 
 # === Options ===
 set(SURFACE "" CACHE STRING "Select your surface api" )
@@ -93,6 +114,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${SURFACE_INCLUDE_SYSTEM}
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+
+configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
 
 # === Definitions ===
 if ("${SURFACE}" STREQUAL "wayland")
