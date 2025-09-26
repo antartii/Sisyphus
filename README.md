@@ -5,6 +5,9 @@ It is the 5th iteration of a engine library created by [Anta](https://bsky.app/p
 ## Dependencies
 - **C99**
 - **CMake 3.12**
+- **Vulkan 1.2**
+- **libwayland**
+- **cglm**
 
 ## Compiling
 To compile the Sisyphus library manually you can configure the file then building the library at the root of the project
