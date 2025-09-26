@@ -8,12 +8,12 @@ namespace Sisyphus {
         _window->height = SSP_WINDOW_DEFAULT_HEIGHT;
         _window->width = SSP_WINDOW_DEFAULT_WIDTH;
 
-        ssp_window_create(_window, config.data());
+        ssp_window_create(_window.get(), config.data());
     }
 
     Window::~Window()
     {
-        ssp_window_destroy(_window);
+        ssp_window_destroy(_window.get());
     }
 
     bool Window::run()

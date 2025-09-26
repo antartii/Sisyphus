@@ -14,10 +14,10 @@ namespace Sisyphus {
 
             bool should_close() const {return _window->should_close;}
             bool run();
-            struct SSPWindow *data() {return _window;}
+            struct SSPWindow *data() {return _window.get();}
         
         private:
-            struct SSPWindow *_window;
+            std::unique_ptr<struct SSPWindow> _window;
             struct SSPConfig _config;
     };
 }

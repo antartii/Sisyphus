@@ -68,5 +68,7 @@ void ssp_engine_destroy(struct SSPEngine *pEngine)
     ssp_renderer_destroy(pEngine->renderer);
     ssp_window_destroy(pEngine->window);
 
+    free(pEngine->window);
+    free(pEngine->renderer);
     free(pEngine);
 }

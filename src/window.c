@@ -27,5 +27,4 @@ void ssp_window_destroy(struct SSPWindow *pWindow)
     #endif
 
     free(pWindow->title);
-    free(pWindow);
 }

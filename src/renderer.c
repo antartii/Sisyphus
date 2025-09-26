@@ -1334,5 +1334,4 @@ void ssp_renderer_destroy(struct SSPRenderer *pRenderer)
         #endif
     }
     ext_func->vkDestroyInstance(context->instance, NULL);
-    free(pRenderer);
 }
