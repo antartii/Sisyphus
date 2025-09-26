@@ -1,5 +1,5 @@
-#ifndef _CAMERA_H
-#define _CAMERA_H
+#ifndef _SISYPHUS_CAMERA_H
+#define _SISYPHUS_CAMERA_H
 
 #include <vulkan/vulkan.h>
 #include <cglm/cglm.h>

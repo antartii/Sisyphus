@@ -1,5 +1,5 @@
-#ifndef _ENGINE_HPP
-#define _ENGINE_HPP
+#ifndef _SISYPHUSPP_ENGINE_HPP
+#define _SISYPHUSPP_ENGINE_HPP
 
 #include "engine.h"
 #include <memory>

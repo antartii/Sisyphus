@@ -1,5 +1,5 @@
-#ifndef _RENDERER_HPP
-#define _RENDERER_HPP
+#ifndef _SISYPHUSPP_RENDERER_HPP
+#define _SISYPHUSPP_RENDERER_HPP
 
 #include "config.hpp"
 #include "window.hpp"

@@ -57,6 +57,14 @@ if (NOT SURFACE_INCLUDE_DIR OR NOT SURFACE_INCLUDE_DIR)
     message(FATAL_ERROR "Libraries and/or include directory for the specified surface not found")
 endif()
 
+foreach(dir IN LISTS SURFACE_INCLUDE_DIR)
+    if(dir MATCHES "^${CMAKE_BINARY_DIR}")
+        list(APPEND SURFACE_INCLUDE_BUILD ${dir})
+    else()
+        list(APPEND SURFACE_INCLUDE_SYSTEM ${dir})
+    endif()
+endforeach()
+
 # === Create the target ===
 add_library(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/src/sisyphus.c
@@ -81,7 +89,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${SURFACE_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${SURFACE_INCLUDE_BUILD}>
+    ${SURFACE_INCLUDE_SYSTEM}
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -121,9 +130,8 @@ generate_export_header(
     export/${PROJECT_NAME}/export_${PROJECT_NAME}.hpp
 )
 
-target_include_directories(
-    ${PROJECT_NAME}
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>   
 )
 

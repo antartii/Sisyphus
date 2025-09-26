@@ -1,5 +1,5 @@
-#ifndef _CONFIG_HPP
-#define _CONFIG_HPP
+#ifndef _SISYPHUSPP_CONFIG_HPP
+#define _SISYPHUSPP_CONFIG_HPP
 
 #include <string>
 #include "utils.hpp"

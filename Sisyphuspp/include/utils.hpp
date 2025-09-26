@@ -1,5 +1,5 @@
-#ifndef _UTILS_HPP
-#define _UTILS_HPP
+#ifndef _SISYPHUSPP_UTILS_HPP
+#define _SISYPHUSPP_UTILS_HPP
 
 #include "utils.h"
 #include <iostream>

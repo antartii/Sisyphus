@@ -1,5 +1,5 @@
-#ifndef _WAYLAND_H
-#define _WAYLAND_H
+#ifndef _SISYPHUS_WAYLAND_H
+#define _SISYPHUS_WAYLAND_H
 
 #include <xdg/xdg-shell-client-protocol.h>
 #include <linux/input-event-codes.h>

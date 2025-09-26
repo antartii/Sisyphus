@@ -1,5 +1,5 @@
-#ifndef _OBJECT_H
-#define _OBJECT_H
+#ifndef _SISYPHUS_OBJECT_H
+#define _SISYPHUS_OBJECT_H
 
 #include <vulkan/vulkan.h>
 #include "shaders.h"

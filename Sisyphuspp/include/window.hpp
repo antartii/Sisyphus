@@ -1,5 +1,5 @@
-#ifndef _WINDOW_HPP
-#define _WINDOW_HPP
+#ifndef _SISYPHUSPP_WINDOW_HPP
+#define _SISYPHUSPP_WINDOW_HPP
 
 #include "window.h"
 #include "config.hpp"

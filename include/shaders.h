@@ -1,5 +1,5 @@
-#ifndef _SHADERS_H
-#define _SHADERS_H
+#ifndef _SISYPHUS_SHADERS_H
+#define _SISYPHUS_SHADERS_H
 
 #include <stdalign.h>
 #include <cglm/cglm.h>

@@ -12,7 +12,7 @@
 #include "sisyphus_config.h"
 #include "utils.h"
 #include "errors.h"
-#include "string.h"
+#include <string.h>
 #include "config.h"
 #include "window.h"
 

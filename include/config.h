@@ -1,5 +1,5 @@
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _SISYPHUS_CONFIG_H
+#define _SISYPHUS_CONFIG_H
 
 #include "utils.h"
 

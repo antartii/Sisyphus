@@ -6,6 +6,7 @@
 #include "surfaces/surfaces.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {

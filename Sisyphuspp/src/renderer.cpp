@@ -1,5 +1,4 @@
 #include "renderer.hpp"
-#include <iostream>
 
 namespace Sisyphus {
     Renderer::Renderer(Window &window, Config &config):

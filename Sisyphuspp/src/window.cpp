@@ -1,5 +1,4 @@
 #include "window.hpp"
-#include <iostream>
 
 namespace Sisyphus {
     Window::Window(Config &config):
