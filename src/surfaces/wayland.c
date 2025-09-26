@@ -75,6 +75,7 @@ void ssp_wayland_surface_end(struct SSPWaylandSurfaceContext *wayland_context)
 enum SSP_ERROR_CODE ssp_wayland_surface_init(struct SSPWindow *window, struct SSPWaylandSurfaceContext *wayland_context, struct SSPConfig *config)
 {
     const char *xdg_title = (config && config->window_title) ? config->window_title : SSP_WAYLAND_WINDOW_TITLE_DEFAULT;
+    const char *xdg_app_title = (config && config->app_name) ? config->app_name : SSP_WAYLAND_WINDOW_TITLE_DEFAULT;
 
     wayland_context->display = wl_display_connect(SSP_WAYLAND_DISPLAY_NAME);
 
@@ -96,6 +97,7 @@ enum SSP_ERROR_CODE ssp_wayland_surface_init(struct SSPWindow *window, struct SS
     xdg_surface_add_listener(wayland_context->xdg_surface, &ssp_wayland_xdg_surface_listener, window);
     wayland_context->xdg_toplevel = xdg_surface_get_toplevel(wayland_context->xdg_surface);
     xdg_toplevel_set_title(wayland_context->xdg_toplevel, xdg_title);
+    xdg_toplevel_set_app_id(wayland_context->xdg_toplevel, xdg_app_title);
     xdg_toplevel_add_listener(wayland_context->xdg_toplevel, &ssp_wayland_xdg_toplevel_listener, window);
 
     wl_surface_commit(wayland_context->surface);
