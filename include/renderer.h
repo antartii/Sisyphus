@@ -210,6 +210,10 @@ enum SSP_ERROR_CODE ssp_renderer_stop(struct SSPRenderer *pRenderer);
 enum SSP_ERROR_CODE ssp_vulkan_create_buffer(struct SSPVulkanContext *pContext, VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkMemoryPropertyFlags memory_properties, VkBuffer *buffer, VkDeviceMemory *memory);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer(struct SSPVulkanContext *pContext, VkBuffer *src_buffer, VkBuffer *dst_buffer, VkDeviceSize size);
 
+struct SSPCamera;
+void ssp_vulkan_update_proj(struct SSPVulkanContext *context, struct SSPCamera *camera);
+void ssp_vulkan_update_view(struct SSPVulkanContext *context, struct SSPCamera *camera);
+
 #ifdef __cplusplus
     }
 #endif

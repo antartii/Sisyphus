@@ -9,6 +9,7 @@
 extern "C" {
 #endif
 
+#define PTR_OFFSET(ptr, offset) ((void *)(((char *)(ptr)) + (offset)))
 #define ARRAY_SIZE(A) (sizeof(A)/sizeof(A[0]))
 
 struct SSPVersion {

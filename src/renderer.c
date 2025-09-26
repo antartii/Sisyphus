@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "object.h"
+#include "camera.h"
 
 static const char *ssp_vulkan_layer_names[] = {
     #ifdef DEBUG
@@ -51,6 +52,26 @@ static bool ssp_vulkan_check_layer_names(struct SSPVulkanContextExtFunc *ext_fun
 
     free(layers_properties);
     return true;
+}
+
+void ssp_vulkan_update_view(struct SSPVulkanContext *context, struct SSPCamera *camera)
+{
+    mat4 view;
+    glm_lookat(camera->pos, camera->target, camera->up, view);
+
+    for (size_t i = 0; i <  SSP_MAX_FRAMES_IN_FLIGHT; ++i)
+        memcpy(context->uniform_buffers_mapped[i], &view, sizeof(mat4));
+}
+
+void ssp_vulkan_update_proj(struct SSPVulkanContext *context, struct SSPCamera *camera)
+{
+    mat4 proj;
+
+    glm_perspective(camera->fov_in_radians, (float) (context->swapchain_extent.width / context->swapchain_extent.height), camera->render_depth_range[0], camera->render_depth_range[1], proj);
+    proj[1][1] *= -1;
+
+    for (size_t i = 0; i <  SSP_MAX_FRAMES_IN_FLIGHT; ++i)
+        memcpy(PTR_OFFSET(context->uniform_buffers_mapped[i], sizeof(mat4)), &proj, sizeof(mat4));
 }
 
 static bool ssp_vulkan_check_extensions_names(struct SSPVulkanContextExtFunc *ext_func)
