@@ -14,6 +14,8 @@ namespace Sisyphus {
 
             bool draw_frame(Window &window);
 
+            struct SSPRenderer *data() {return _renderer.get();}
+
         private:
             std::unique_ptr<struct SSPRenderer> _renderer;
     };

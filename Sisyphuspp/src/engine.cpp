@@ -17,5 +17,11 @@ namespace Sisyphus {
             && _window.run()
             && _renderer.draw_frame(_window);
     }
+    
+    void Engine::updateCamera(Camera &camera)
+    {
+        ssp_vulkan_update_proj(&_renderer.data()->vulkan_context, camera.data());
+        ssp_vulkan_update_view(&_renderer.data()->vulkan_context, camera.data());
+    }
 }
 

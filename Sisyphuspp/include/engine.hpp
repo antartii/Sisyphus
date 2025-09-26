@@ -8,6 +8,7 @@
 #include "config.hpp"
 #include <string>
 #include "renderer.hpp"
+#include "camera.hpp"
 
 namespace Sisyphus {
     class Engine {
@@ -16,6 +17,7 @@ namespace Sisyphus {
             ~Engine();
 
             bool run();
+            void updateCamera(Camera &camera);
 
         private :
             Window _window;

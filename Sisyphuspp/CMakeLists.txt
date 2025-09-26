@@ -27,6 +27,7 @@ add_library(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/src/renderer.cpp
     ${PROJECT_SOURCE_DIR}/src/utils.cpp
     ${PROJECT_SOURCE_DIR}/src/window.cpp
+    ${PROJECT_SOURCE_DIR}/src/camera.cpp
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

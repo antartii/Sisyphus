@@ -45,7 +45,7 @@ struct SSPEngine *ssp_engine_create(struct SSPConfig *config, enum SSP_ERROR_COD
     (err_code = ssp_window_create(pEngine->window, config))
     || (err_code = ssp_renderer_create(pEngine->renderer, pEngine->window, config));
 
-    pEngine->camera = ssp_camera_create(pEngine);
+    pEngine->camera = ssp_camera_create();
     ssp_camera_update(pEngine, pEngine->camera);
 
     if (err_code != SSP_ERROR_CODE_SUCCESS) {
@@ -68,8 +68,9 @@ void ssp_engine_destroy(struct SSPEngine *pEngine)
 
     ssp_renderer_destroy(pEngine->renderer);
     ssp_window_destroy(pEngine->window);
-    ssp_camera_destroy(pEngine, pEngine->camera);
+    ssp_camera_destroy(pEngine->camera);
 
+    free(pEngine->camera);
     free(pEngine->window);
     free(pEngine->renderer);
     free(pEngine);

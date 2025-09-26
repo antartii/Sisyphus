@@ -1,7 +1,7 @@
 #include "camera.h"
 #include "engine.h"
 
-struct SSPCamera *ssp_camera_create(struct SSPEngine *pEngine)
+struct SSPCamera *ssp_camera_create()
 {
     struct SSPCamera *camera = calloc(1, sizeof(struct SSPCamera));
     ssp_camera_init(camera);
@@ -25,7 +25,6 @@ void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera)
     ssp_vulkan_update_view(&pEngine->renderer->vulkan_context, camera);
 }
 
-void ssp_camera_destroy(struct SSPEngine *pEngine, struct SSPCamera *camera)
+void ssp_camera_destroy(struct SSPCamera *camera)
 {
-    free(camera);
 }
