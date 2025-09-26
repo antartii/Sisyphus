@@ -45,6 +45,8 @@ struct SSPEngine *ssp_engine_create(struct SSPConfig *config, enum SSP_ERROR_COD
     (err_code = ssp_window_create(pEngine->window, config))
     || (err_code = ssp_renderer_create(pEngine->renderer, pEngine->window, config));
 
+    pEngine->camera = ssp_camera_create(pEngine);
+
     if (err_code != SSP_ERROR_CODE_SUCCESS) {
         ssp_engine_error(pEngine, err_code);
         return NULL;

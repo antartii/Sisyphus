@@ -17,9 +17,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # === Options ===
 set(SURFACE "" CACHE STRING "Select your surface api")
-add_subdirectory(../ ${PROJECT_BINARY_DIR}/SisyphusC)
 
 # === Create the target ===
+add_subdirectory(../ ${PROJECT_BINARY_DIR}/SisyphusC)
+
 add_library(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/src/engine.cpp
     ${PROJECT_SOURCE_DIR}/src/config.cpp

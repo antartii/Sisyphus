@@ -5,6 +5,7 @@
 #include "window.h"
 #include "errors.h"
 #include "surfaces/surfaces.h"
+#include "camera.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -26,6 +27,8 @@ struct SSPEngine {
     struct SSPRenderer *renderer;
 
     struct SSPEngineErrorHandler error_handler;
+    struct SSPCamera *camera;
+    bool external_camera;
 };
 
 struct SSPEngine *ssp_engine_create(struct SSPConfig *config, enum SSP_ERROR_CODE *error_code);

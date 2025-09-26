@@ -66,6 +66,7 @@ add_library(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/src/errors.c
     ${PROJECT_SOURCE_DIR}/src/utils.c
     ${PROJECT_SOURCE_DIR}/src/object.c
+    ${PROJECT_SOURCE_DIR}/src/camera.c
     ${SURFACE_SRC}
 )
 

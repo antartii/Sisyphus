@@ -39,7 +39,8 @@ enum SSP_ERROR_SEVERITY {
     X(SSP_ERROR_CODE_VULKAN_CREATE_GRAPHIC_PIPELINE, "VUlkan context_couldn't create the graphic pipeline", SSP_ERROR_SEVERITY_CRITICAL)    \
     X(SSP_ERROR_CODE_VULKAN_CREATE_UNIFORM_BUFFERS, "Vulkan context couldn't create the uniform buffers", SSP_ERROR_SEVERITY_CRITICAL)  \
     X(SSP_ERROR_CODE_VULKAN_CREATE_BUFFER, "Vulkan couldn't create a buffer", SSP_ERROR_SEVERITY_WARNING)   \
-    X(SSP_ERROR_CODE_VULKAN_CREATE_DESCRIPTOR_POOL, "Vulkan couldn't create the descriptor pool", SSP_ERROR_SEVERITY_CRITICAL)
+    X(SSP_ERROR_CODE_VULKAN_CREATE_DESCRIPTOR_POOL, "Vulkan couldn't create the descriptor pool", SSP_ERROR_SEVERITY_CRITICAL)  \
+    X(SSP_ERROR_CODE_RENDERER_INIT_CAMERA, "Renderer couldn't initialise the camera", SSP_ERROR_SEVERITY_CRITICAL)
 
 enum SSP_ERROR_CODE {
     #define X(code, str, severity) code,

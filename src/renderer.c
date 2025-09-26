@@ -1175,6 +1175,29 @@ static enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_pool(struct SSPVulkanCon
     return SSP_ERROR_CODE_SUCCESS;
 }
 
+static enum SSP_ERROR_CODE ssp_vulkan_update_descriptor_sets(struct SSPVulkanContext *pContext)
+{
+    struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
+
+    VkDescriptorBufferInfo buffer_info = {0};
+    buffer_info.range = sizeof(struct SSPShaderUniformBuffer);
+
+    VkWriteDescriptorSet write_descriptor = {0};
+    write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor.dstBinding = 0;
+    write_descriptor.dstArrayElement = 0;
+    write_descriptor.descriptorCount = 1;
+    write_descriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    write_descriptor.pBufferInfo = &buffer_info;
+    
+    for (size_t i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i) {
+        buffer_info.buffer = pContext->uniform_buffers[i];
+        write_descriptor.dstSet = pContext->descriptor_sets[i];
+
+        ext_func->vkUpdateDescriptorSets(pContext->logical_device, 1, &write_descriptor, 0, NULL);
+    }
+}
+
 static enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_sets(struct SSPVulkanContext *pContext)
 {
     struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
@@ -1195,23 +1218,7 @@ static enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_sets(struct SSPVulkanCon
         return false;
     }
 
-    VkDescriptorBufferInfo buffer_info = {0};
-    buffer_info.range = sizeof(struct SSPShaderUniformBuffer);
-
-    VkWriteDescriptorSet write_descriptor = {0};
-    write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write_descriptor.dstBinding = 0;
-    write_descriptor.dstArrayElement = 0;
-    write_descriptor.descriptorCount = 1;
-    write_descriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    write_descriptor.pBufferInfo = &buffer_info;
-    
-    for (size_t i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i) {
-        buffer_info.buffer = pContext->uniform_buffers[i];
-        write_descriptor.dstSet = pContext->descriptor_sets[i];
-
-        ext_func->vkUpdateDescriptorSets(pContext->logical_device, 1, &write_descriptor, 0, NULL);
-    }
+    ssp_vulkan_update_descriptor_sets(pContext);
 
     free(layouts);
     return SSP_ERROR_CODE_SUCCESS;
@@ -1301,7 +1308,7 @@ void ssp_renderer_destroy(struct SSPRenderer *pRenderer)
         }
 
         if (context->render_finished_semaphores) {
-            for (int i = 0; i < context->swapchain_images_count; ++i)
+            for (int i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i)
                 ext_func->vkDestroySemaphore(context->logical_device, context->render_finished_semaphores[i], NULL);
             free(context->render_finished_semaphores);
         }
