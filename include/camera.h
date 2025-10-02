@@ -21,10 +21,6 @@ struct SSPCamera {
 
     vec2 render_depth_range;
     float fov_in_radians;
-
-    VkBuffer *uniform_buffers;
-    VkDeviceMemory *uniform_buffers_memory;
-    void **uniform_buffers_mapped;
 };
 
 struct SSPCamera *ssp_camera_create();

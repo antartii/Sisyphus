@@ -13,8 +13,8 @@ extern "C" {
 #endif
 
 #define SSP_WINDOW_TITLE_DEFAULT "Sisyphus window"
-#define SSP_WINDOW_DEFAULT_WIDTH 1080
-#define SSP_WINDOW_DEFAULT_HEIGHT 1920
+#define SSP_WINDOW_DEFAULT_WIDTH 1920
+#define SSP_WINDOW_DEFAULT_HEIGHT 1080
 
 struct SSPWindow {
     int width;

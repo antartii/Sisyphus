@@ -12,6 +12,11 @@ namespace Sisyphus {
         ssp_renderer_destroy(_renderer.get());
     }
 
+    void Renderer::stop()
+    {
+        vkDeviceWaitIdle(_renderer->vulkan_context.logical_device);
+    }
+
     bool Renderer::draw_frame(Window &window)
     {
         return (ssp_renderer_draw_frame(_renderer.get(), window.data()) == SSP_ERROR_CODE_SUCCESS);

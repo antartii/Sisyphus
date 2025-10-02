@@ -9,6 +9,7 @@
 #include <string>
 #include "renderer.hpp"
 #include "camera.hpp"
+#include "object.hpp"
 
 namespace Sisyphus {
     class Engine {
@@ -18,6 +19,10 @@ namespace Sisyphus {
 
             bool run();
             void updateCamera(Camera &camera);
+            void draw(Object &object);
+
+            Renderer &getRenderer() {return _renderer;}
+            Window &getWindow() {return _window;}
 
         private :
             Window _window;

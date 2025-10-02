@@ -174,6 +174,8 @@ struct SSPVulkanContext {
     VkDescriptorPool descriptor_pool;
     VkDescriptorSet *descriptor_sets;
 
+    struct SSPCamera *cameraData;
+
     #ifdef DEBUG
     VkDebugUtilsMessengerEXT debug_messenger;
     #endif
@@ -210,9 +212,12 @@ enum SSP_ERROR_CODE ssp_renderer_stop(struct SSPRenderer *pRenderer);
 enum SSP_ERROR_CODE ssp_vulkan_create_buffer(struct SSPVulkanContext *pContext, VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkMemoryPropertyFlags memory_properties, VkBuffer *buffer, VkDeviceMemory *memory);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer(struct SSPVulkanContext *pContext, VkBuffer *src_buffer, VkBuffer *dst_buffer, VkDeviceSize size);
 
+enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContext *pContext, VkBuffer *buffer, VkDeviceMemory *memory, struct SSPShaderVertex *vertices, uint32_t vertices_count);
+enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContext *pContext, VkBuffer *buffer, VkDeviceMemory *memory, uint16_t *indices, uint32_t indices_count);
+
 struct SSPCamera;
-void ssp_vulkan_update_proj(struct SSPVulkanContext *context, struct SSPCamera *camera);
-void ssp_vulkan_update_view(struct SSPVulkanContext *context, struct SSPCamera *camera);
+void ssp_vulkan_update_proj(struct SSPVulkanContext *context);
+void ssp_vulkan_update_view(struct SSPVulkanContext *context);
 
 #ifdef __cplusplus
     }

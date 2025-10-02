@@ -11,7 +11,7 @@ struct SSPCamera *ssp_camera_create()
 
 void ssp_camera_init(struct SSPCamera *camera)
 {
-    glm_vec3_copy((vec3) {0.0f, 0.0f, 2.0f}, camera->pos);
+    glm_vec3_copy((vec3) {0.0f, 0.0f, 1.0f}, camera->pos);
     glm_vec3_copy((vec3) {0.0f, 0.0f, 0.0f}, camera->target);
     glm_vec3_copy((vec3) {0.0f, 1.0f, 0.0f}, camera->up);
 
@@ -21,8 +21,10 @@ void ssp_camera_init(struct SSPCamera *camera)
 
 void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera)
 {
-    ssp_vulkan_update_proj(&pEngine->renderer->vulkan_context, camera);
-    ssp_vulkan_update_view(&pEngine->renderer->vulkan_context, camera);
+    pEngine->renderer->vulkan_context.cameraData = camera;
+
+    ssp_vulkan_update_proj(&pEngine->renderer->vulkan_context);
+    ssp_vulkan_update_view(&pEngine->renderer->vulkan_context);
 }
 
 void ssp_camera_destroy(struct SSPCamera *camera)

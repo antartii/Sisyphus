@@ -54,24 +54,79 @@ static bool ssp_vulkan_check_layer_names(struct SSPVulkanContextExtFunc *ext_fun
     return true;
 }
 
-void ssp_vulkan_update_view(struct SSPVulkanContext *context, struct SSPCamera *camera)
+void ssp_vulkan_update_view(struct SSPVulkanContext *context)
 {
+    struct SSPCamera *camera = context->cameraData;
+
+    if (!camera)
+        return;
+
     mat4 view;
-    glm_lookat(camera->pos, camera->target, camera->up, view);
+    glm_mat4_identity(view);
 
     for (size_t i = 0; i <  SSP_MAX_FRAMES_IN_FLIGHT; ++i)
         memcpy(context->uniform_buffers_mapped[i], &view, sizeof(mat4));
 }
 
-void ssp_vulkan_update_proj(struct SSPVulkanContext *context, struct SSPCamera *camera)
+void ssp_vulkan_update_proj(struct SSPVulkanContext *context)
 {
-    mat4 proj;
+    struct SSPCamera *camera = context->cameraData;
 
-    glm_perspective(camera->fov_in_radians, (float) (context->swapchain_extent.width / context->swapchain_extent.height), camera->render_depth_range[0], camera->render_depth_range[1], proj);
-    proj[1][1] *= -1;
+    if (!camera)
+        return;
+
+    mat4 proj;
+    glm_ortho(0.0f, (float) context->swapchain_extent.width, (float) context->swapchain_extent.height, 0.0f, -1.0f, 1.0f, proj);
 
     for (size_t i = 0; i <  SSP_MAX_FRAMES_IN_FLIGHT; ++i)
         memcpy(PTR_OFFSET(context->uniform_buffers_mapped[i], sizeof(mat4)), &proj, sizeof(mat4));
+}
+
+enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContext *pContext, VkBuffer *buffer, VkDeviceMemory *memory, struct SSPShaderVertex *vertices, uint32_t vertices_count)
+{
+    struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
+    VkDeviceSize size = sizeof(struct SSPShaderVertex) * vertices_count;
+
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_memory;
+
+    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &staging_buffer, &staging_memory);
+
+    void *data_staging;
+    ext_func->vkMapMemory(pContext->logical_device, staging_memory, 0, size, 0, &data_staging);
+    memcpy(data_staging, vertices, size);
+    ext_func->vkUnmapMemory(pContext->logical_device, staging_memory);
+
+    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, memory);
+    ssp_vulkan_copy_buffer(pContext, &staging_buffer, buffer, size);
+    ext_func->vkDestroyBuffer(pContext->logical_device, staging_buffer, NULL);
+    ext_func->vkFreeMemory(pContext->logical_device, staging_memory, NULL);
+
+    return SSP_ERROR_CODE_SUCCESS;
+}
+
+enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContext *pContext, VkBuffer *buffer, VkDeviceMemory *memory, uint16_t *indices, uint32_t indices_count)
+{
+    struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
+
+    VkDeviceSize size = sizeof(uint16_t) * indices_count;
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_memory;
+
+    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &staging_buffer, &staging_memory);
+    
+    void *data_staging;
+    ext_func->vkMapMemory(pContext->logical_device, staging_memory, 0, size, 0, &data_staging);
+    memcpy(data_staging, indices, size);
+    ext_func->vkUnmapMemory(pContext->logical_device, staging_memory);
+
+    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, memory);
+    ssp_vulkan_copy_buffer(pContext, &staging_buffer, buffer, size);
+
+    ext_func->vkDestroyBuffer(pContext->logical_device, staging_buffer, NULL);
+    ext_func->vkFreeMemory(pContext->logical_device, staging_memory, NULL);
+
+    return SSP_ERROR_CODE_SUCCESS;
 }
 
 static bool ssp_vulkan_check_extensions_names(struct SSPVulkanContextExtFunc *ext_func)
@@ -535,7 +590,7 @@ static enum SSP_ERROR_CODE ssp_vulkan_create_swapchain(struct SSPVulkanContext *
     pContext->swapchain_extent = ssp_vulkan_swapchain_choose_extent(surface_capabilities.currentExtent, surface_capabilities.minImageExtent, surface_capabilities.maxImageExtent, window);
     if (pContext->swapchain_extent.width == 0 || pContext->swapchain_extent.height == 0)
         return SSP_ERROR_CODE_VULKAN_SWAPCHAIN_EXTENT;
-
+    
     VkCompositeAlphaFlagBitsKHR composite_alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     
     if (!(surface_capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR))
@@ -796,6 +851,9 @@ static enum SSP_ERROR_CODE ssp_renderer_resize(struct SSPVulkanContext *pContext
 
         ssp_vulkan_create_swapchain(pContext, window);
         ssp_vulkan_create_image_view(pContext);
+
+        ssp_vulkan_update_proj(pContext);
+        ssp_vulkan_update_view(pContext);
     }
 
     window->resize_needed = false;

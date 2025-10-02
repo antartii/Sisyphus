@@ -13,8 +13,10 @@ namespace Sisyphus {
             ~Renderer();
 
             bool draw_frame(Window &window);
+            void stop();
 
             struct SSPRenderer *data() {return _renderer.get();}
+            struct SSPVulkanContext *dataVulkanContext() {return &_renderer->vulkan_context;}
 
         private:
             std::unique_ptr<struct SSPRenderer> _renderer;

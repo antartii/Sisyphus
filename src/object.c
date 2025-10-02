@@ -1,51 +1,5 @@
 #include "object.h"
-
-static enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContext *pContext, struct SSPObject *object, struct SSPShaderVertex *vertices, uint32_t vertices_count)
-{
-    struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
-    VkDeviceSize size = sizeof(struct SSPShaderVertex) * vertices_count;
-
-    VkBuffer staging_buffer;
-    VkDeviceMemory staging_memory;
-
-    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &staging_buffer, &staging_memory);
-
-    void *data_staging;
-    ext_func->vkMapMemory(pContext->logical_device, staging_memory, 0, size, 0, &data_staging);
-    memcpy(data_staging, vertices, size);
-    ext_func->vkUnmapMemory(pContext->logical_device, staging_memory);
-
-    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &object->vertex_buffer, &object->vertex_memory);
-    ssp_vulkan_copy_buffer(pContext, &staging_buffer, &object->vertex_buffer, size);
-    ext_func->vkDestroyBuffer(pContext->logical_device, staging_buffer, NULL);
-    ext_func->vkFreeMemory(pContext->logical_device, staging_memory, NULL);
-
-    return SSP_ERROR_CODE_SUCCESS;
-}
-
-static enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContext *pContext, struct SSPObject *object, uint16_t *indices, uint32_t indices_count)
-{
-    struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
-
-    VkDeviceSize size = sizeof(uint16_t) * indices_count;
-    VkBuffer staging_buffer;
-    VkDeviceMemory staging_memory;
-
-    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &staging_buffer, &staging_memory);
-    
-    void *data_staging;
-    ext_func->vkMapMemory(pContext->logical_device, staging_memory, 0, size, 0, &data_staging);
-    memcpy(data_staging, indices, size);
-    ext_func->vkUnmapMemory(pContext->logical_device, staging_memory);
-
-    ssp_vulkan_create_buffer(pContext, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &object->index_buffer, &object->index_memory);
-    ssp_vulkan_copy_buffer(pContext, &staging_buffer, &object->index_buffer, size);
-
-    ext_func->vkDestroyBuffer(pContext->logical_device, staging_buffer, NULL);
-    ext_func->vkFreeMemory(pContext->logical_device, staging_memory, NULL);
-
-    return true;
-}
+#include "renderer.h"
 
 struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count)
 {
@@ -60,8 +14,8 @@ struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos
         glm_vec2(vertices_pos[i], vertices[i].pos);
     }
 
-    if (ssp_vulkan_create_vertex_buffer(&engine->renderer->vulkan_context, object, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
-        || !ssp_vulkan_create_index_buffer(&engine->renderer->vulkan_context, object, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
+    if (ssp_vulkan_create_vertex_buffer(&engine->renderer->vulkan_context, &object->vertex_buffer, &object->vertex_memory, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
+        || !ssp_vulkan_create_index_buffer(&engine->renderer->vulkan_context, &object->index_buffer, &object->index_memory, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
         free(vertices);
         free(object);
         return NULL;
