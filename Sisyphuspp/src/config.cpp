@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include "config.h"
 
 namespace Sisyphus {
     Config::Config(const std::string appName, const Version version, const std::string windowTitle):

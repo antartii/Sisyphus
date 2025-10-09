@@ -1,4 +1,6 @@
 #include "utils.hpp"
+#include "utils.h"
+#include "sisyphus.h"
 
 namespace Sisyphus {
     Version::Version(const int major, const int minor, const int patch):
@@ -20,5 +22,10 @@ namespace Sisyphus {
         data.patch = _patch;
 
         return data;
+    }
+
+    void libraryPrintInfo()
+    {
+        ssp_library_print_info();
     }
 }

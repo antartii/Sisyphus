@@ -1,5 +1,4 @@
 #include "object.h"
-#include "renderer.h"
 
 struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count)
 {
@@ -13,6 +12,8 @@ struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos
         glm_vec3(color, vertices[i].color);
         glm_vec2(vertices_pos[i], vertices[i].pos);
     }
+
+    object->status = SSP_OBJECT_NOT_INITIALISED;
 
     if (ssp_vulkan_create_vertex_buffer(&engine->renderer->vulkan_context, &object->vertex_buffer, &object->vertex_memory, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
         || !ssp_vulkan_create_index_buffer(&engine->renderer->vulkan_context, &object->index_buffer, &object->index_memory, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {

@@ -21,6 +21,7 @@ set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 # === Compiling shaders ===
 set(SLANGC "$ENV{HOME}/VulkanSDK/1.4.309.0/x86_64/bin/slangc")
 set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/shaders.spv)
+set(DEPENDENCIES_OUTPUT ${CMAKE_BINARY_DIR}/lib)
 
 add_custom_command(
     OUTPUT ${SHADER_OUTPUT}
@@ -86,8 +87,15 @@ foreach(dir IN LISTS SURFACE_INCLUDE_DIR)
     endif()
 endforeach()
 
+option(C_BUILD_STATIC "Build sisyphus with visibility of symbols not hidden" OFF)
+if (C_BUILD_STATIC)
+    set(C_LIB_TYPE STATIC)
+else()
+    set(C_LIB_TYPE SHARED)
+endif()
+
 # === Create the target ===
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} ${C_LIB_TYPE}
     ${PROJECT_SOURCE_DIR}/src/sisyphus.c
     ${PROJECT_SOURCE_DIR}/src/engine.c
     ${PROJECT_SOURCE_DIR}/src/renderer.c
@@ -96,6 +104,22 @@ add_library(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/src/utils.c
     ${PROJECT_SOURCE_DIR}/src/object.c
     ${PROJECT_SOURCE_DIR}/src/camera.c
+
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/vulkan_context.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/ext_func.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/buffer.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/utils.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/instance.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/debug.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/surface.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/physical_device.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/logical_device.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/queue.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/swapchain.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/graphic.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/command_buffer.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/sync_object.c
+
     ${SURFACE_SRC}
 )
 
@@ -110,12 +134,17 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib>
     $<BUILD_INTERFACE:${SURFACE_INCLUDE_BUILD}>
     ${SURFACE_INCLUDE_SYSTEM}
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
+
+if (C_BUILD_STATIC)
+    set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # === Definitions ===
 if ("${SURFACE}" STREQUAL "wayland")
@@ -138,13 +167,11 @@ endif()
 include(GenerateExportHeader)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
+    C_VISIBILITY_PRESET hidden
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN TRUE
     VERSION ${PROJECT_VERSION}
     SOVERSION ${COMPAT_VERSION}
-)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    C_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN TRUE
 )
 
 generate_export_header(

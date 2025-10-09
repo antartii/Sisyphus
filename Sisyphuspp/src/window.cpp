@@ -1,4 +1,5 @@
 #include "window.hpp"
+#include "window.h"
 
 namespace Sisyphus {
     Window::Window(Config &config):
@@ -13,6 +14,11 @@ namespace Sisyphus {
     Window::~Window()
     {
         ssp_window_destroy(_window.get());
+    }
+
+    bool Window::should_close() const
+    {
+        return _window->should_close;
     }
 
     bool Window::run()

@@ -1,5 +1,6 @@
 #include "object.hpp"
 #include "engine.hpp"
+#include "object.h"
 
 namespace Sisyphus {
     Object::Object(Engine &engine, std::vector<glm::vec2> verticesPos, glm::vec3 color, std::vector<uint16_t> indices, uint32_t verticesCount):
@@ -18,16 +19,7 @@ namespace Sisyphus {
 
             vertices[i].pos[0] = verticesPos[i].x;
             vertices[i].pos[1] = verticesPos[i].y;
-
-            printf("color: %f, %f, %f\n", vertices[i].color[0], vertices[i].color[1], vertices[i].color[2]);
-            printf("pos: %f, %f\n", vertices[i].pos[0], vertices[i].pos[1]);
         }
-
-        printf("\n indices: ");
-        for (uint32_t i = 0; i < indices.size(); ++i)
-            printf(" %hu,", indices[i]);
-
-        printf("\n");
 
         if (ssp_vulkan_create_vertex_buffer(engine.getRenderer().dataVulkanContext(), &_object->vertex_buffer, &_object->vertex_memory, vertices.data(), verticesCount) != SSP_ERROR_CODE_SUCCESS
             || ssp_vulkan_create_index_buffer(engine.getRenderer().dataVulkanContext(), &_object->index_buffer, &_object->index_memory, indices.data(), _object->indices_count) != SSP_ERROR_CODE_SUCCESS) {

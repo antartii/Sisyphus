@@ -4,10 +4,13 @@
 #include "config.hpp"
 #include "window.hpp"
 #include <memory>
-#include "renderer.h"
+#include "export.hpp"
+
+struct SSPRenderer;
+struct SSPVulkanContext;
 
 namespace Sisyphus {
-    class Renderer {
+    class SSP_API Renderer {
         public :
             Renderer(Window &window, Config &config);
             ~Renderer();
@@ -15,8 +18,8 @@ namespace Sisyphus {
             bool draw_frame(Window &window);
             void stop();
 
-            struct SSPRenderer *data() {return _renderer.get();}
-            struct SSPVulkanContext *dataVulkanContext() {return &_renderer->vulkan_context;}
+            struct SSPRenderer *data();
+            struct SSPVulkanContext *dataVulkanContext();
 
         private:
             std::unique_ptr<struct SSPRenderer> _renderer;

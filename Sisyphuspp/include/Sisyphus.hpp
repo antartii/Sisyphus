@@ -3,6 +3,5 @@
 
 #include "engine.hpp"
 #include "utils.hpp"
-#include "sisyphus.h"
 
 #endif

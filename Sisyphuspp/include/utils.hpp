@@ -1,14 +1,16 @@
 #ifndef _SISYPHUSPP_UTILS_HPP
 #define _SISYPHUSPP_UTILS_HPP
 
-#include "utils.h"
 #include <iostream>
 #include <memory>
 #include <new>
 #include <cstdlib>
+#include "export.hpp"
+
+struct SSPVersion;
 
 namespace Sisyphus {
-    class Version {
+    class SSP_API Version {
         public:
             int _major;
             int _minor;
@@ -21,6 +23,8 @@ namespace Sisyphus {
 
         private:
     };
+
+    SSP_API void libraryPrintInfo();
 }
 
 #endif

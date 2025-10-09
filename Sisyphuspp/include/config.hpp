@@ -3,12 +3,14 @@
 
 #include <string>
 #include "utils.hpp"
-#include "config.h"
 #include <memory>
 #include <cstring>
+#include "export.hpp"
+
+struct SSPConfig;
 
 namespace Sisyphus {
-    class Config {
+    class SSP_API Config {
         public :
             Config(const std::string appName = "Sisyphus app", const Version version = Version(), const std::string windowTitle = "Sisyphus window");
             ~Config();

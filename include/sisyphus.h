@@ -15,7 +15,7 @@ extern "C" {
 /**
  * @brief Printing in stdout the version, the description, and the current surface used by the Sisyphus library
  */
-void ssp_library_print_info(void);
+SSP_API void ssp_library_print_info(void);
 
 #ifdef __cplusplus
     }

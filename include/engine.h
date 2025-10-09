@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "surfaces/surfaces.h"
 #include "camera.h"
+#include "vulkan_context/vulkan_context.h"
 
 #include <stdlib.h>
 #include <stdbool.h>

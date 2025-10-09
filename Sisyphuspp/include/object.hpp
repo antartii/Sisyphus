@@ -4,12 +4,14 @@
 #include <memory>
 #include <vector>
 #include <glm/glm.hpp>
-#include "object.h"
+#include "export.hpp"
+
+struct SSPObject;
 
 namespace Sisyphus {
     class Engine;
 
-    class Object {
+    class SSP_API Object {
         public:
             Object(Engine &engine, std::vector<glm::vec2> verticesPos, glm::vec3 color, std::vector<uint16_t> indices, uint32_t verticesCount);
             ~Object();
@@ -21,7 +23,7 @@ namespace Sisyphus {
             std::unique_ptr<struct SSPObject> _object;
     };
 
-    class Rectangle : public Object {
+    class SSP_API Rectangle : public Object {
         public:
             Rectangle(Engine &engine, glm::vec2 pos, glm::vec2 size, glm::vec3 color);
             ~Rectangle();

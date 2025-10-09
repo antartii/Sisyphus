@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "engine.h"
 
 namespace Sisyphus {    
     Engine::Engine(Config &config):
@@ -24,7 +25,7 @@ namespace Sisyphus {
 
     void Engine::draw(Object &object)
     {
-        ssp_dynamic_array_push(_renderer.data()->objects_to_draw, object.data());
+        ssp_dynamic_array_push(_renderer.data()->objects_to_draw, (void *) object.data());
     }
     
     void Engine::updateCamera(Camera &camera)
@@ -33,8 +34,7 @@ namespace Sisyphus {
 
         _renderer.dataVulkanContext()->cameraData = data;
 
-        ssp_vulkan_update_proj(_renderer.dataVulkanContext());
-        ssp_vulkan_update_view(_renderer.dataVulkanContext());
+        ssp_vulkan_update_proj(camera.data(), _renderer.dataVulkanContext()->uniform_buffers_mapped, _renderer.dataVulkanContext()->swapchain_extent);
+        ssp_vulkan_update_view(camera.data(), _renderer.dataVulkanContext()->uniform_buffers_mapped);
     }
 }
-

@@ -1,0 +1,128 @@
+#include "vulkan_context/swapchain.h"
+
+static VkSurfaceFormatKHR ssp_vulkan_swapchain_choose_format(struct SSPVulkanContextExtFunc *ext_func, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+{
+    uint32_t surface_formats_count;
+    ext_func->vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &surface_formats_count, NULL);
+    VkSurfaceFormatKHR *surface_formats = malloc(sizeof(VkSurfaceFormatKHR) * surface_formats_count);
+    ext_func->vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &surface_formats_count, surface_formats);
+    VkSurfaceFormatKHR result = surface_formats[0];
+
+    for (uint32_t i = 0; i < surface_formats_count; ++i) {
+        if (surface_formats[i].format == VK_FORMAT_R8G8B8A8_SRGB && surface_formats[i].colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            result = surface_formats[i];
+            break;
+        }
+    }
+
+    free(surface_formats);
+    return result;
+}
+
+static VkPresentModeKHR ssp_vulkan_swapchain_choose_present_mode(struct SSPVulkanContextExtFunc *ext_func, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+{
+    uint32_t present_modes_count;
+    ext_func->vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &present_modes_count, NULL);
+    VkPresentModeKHR *present_modes = malloc(sizeof(VkPresentModeKHR) * present_modes_count);
+    ext_func->vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &present_modes_count, present_modes);
+    VkPresentModeKHR result = VK_PRESENT_MODE_FIFO_KHR;
+
+    for (uint32_t i = 0; i < present_modes_count; ++i) {
+        if (present_modes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
+            result = present_modes[i];
+            break;
+        }
+    }
+
+    free(present_modes);
+    return result;
+}
+
+static VkExtent2D ssp_vulkan_swapchain_choose_extent(VkExtent2D current_extent, VkExtent2D min_extent, VkExtent2D max_extent, struct SSPWindow *window)
+{
+    if (current_extent.width == UINT32_MAX) {
+        current_extent.width = clamp_int(window->width, min_extent.width, max_extent.width);
+        current_extent.height = clamp_int(window->height, min_extent.height, max_extent.height);
+    }
+
+    return current_extent;
+}
+
+enum SSP_ERROR_CODE ssp_vulkan_create_swapchain(
+    struct SSPVulkanContextExtFunc *ext_func,
+    VkPhysicalDevice physical_device,
+    VkDevice logical_device,
+    VkSurfaceKHR surface,
+    struct SSPWindow *window,
+    VkFormat *swapchain_image_format, 
+    VkExtent2D *swapchain_extent,
+    struct SSPVulkanQueueFamiliesIndices queue_family_indices,
+    VkSwapchainKHR *swapchain,
+    int *swapchain_images_count,
+    VkImage **swapchain_images)
+{
+    VkSurfaceCapabilitiesKHR surface_capabilities;
+    ext_func->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &surface_capabilities);
+
+    VkSurfaceFormatKHR surface_format = ssp_vulkan_swapchain_choose_format(ext_func, physical_device, surface);
+    *swapchain_image_format = surface_format.format;
+    VkPresentModeKHR present_mode = ssp_vulkan_swapchain_choose_present_mode(ext_func, physical_device, surface);
+    *swapchain_extent = ssp_vulkan_swapchain_choose_extent(surface_capabilities.currentExtent, surface_capabilities.minImageExtent, surface_capabilities.maxImageExtent, window);
+    if (swapchain_extent->width == 0 || swapchain_extent->height == 0)
+        return SSP_ERROR_CODE_VULKAN_SWAPCHAIN_EXTENT;
+    
+    VkCompositeAlphaFlagBitsKHR composite_alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    
+    if (!(surface_capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR))
+        composite_alpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+
+    VkSwapchainCreateInfoKHR create_info = {0};
+    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.surface = surface;
+    create_info.clipped = VK_TRUE;
+    create_info.compositeAlpha = composite_alpha;
+    create_info.imageArrayLayers = 1;
+    create_info.imageColorSpace = surface_format.colorSpace;
+    create_info.imageExtent = *swapchain_extent;
+    create_info.imageFormat = *swapchain_image_format;
+    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    create_info.minImageCount = surface_capabilities.minImageCount;
+    create_info.presentMode = present_mode;
+    create_info.preTransform = surface_capabilities.currentTransform;
+
+    if (queue_family_indices.graphic == queue_family_indices.present)
+        create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    else {
+        uint32_t queue_family_indices_arr[] = {queue_family_indices.graphic, queue_family_indices.present};
+        create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        create_info.pQueueFamilyIndices = queue_family_indices_arr;
+        create_info.queueFamilyIndexCount = 2;
+    }
+
+    if (ext_func->vkCreateSwapchainKHR(logical_device, &create_info, NULL, swapchain) != VK_SUCCESS)
+        return SSP_ERROR_CODE_VULKAN_SWAPCHAIN_CREATION;
+
+    *swapchain_images_count = surface_capabilities.minImageCount;
+    *swapchain_images = calloc(*swapchain_images_count, sizeof(VkImage));
+    ext_func->vkGetSwapchainImagesKHR(logical_device, *swapchain, swapchain_images_count, *swapchain_images);
+
+    return SSP_ERROR_CODE_SUCCESS;
+}
+
+enum SSP_ERROR_CODE ssp_vulkan_swapchain_destroy(struct SSPVulkanContextExtFunc *ext_func,
+    VkImageView *swapchain_image_views,
+    int swapchain_images_count,
+    VkImage *swapchain_images,
+    VkDevice logical_device,
+    VkSwapchainKHR swapchain)
+{
+    if (swapchain_image_views) {
+        for (int i = 0; i < swapchain_images_count; ++i)
+            ext_func->vkDestroyImageView(logical_device, swapchain_image_views[i], NULL);
+        free(swapchain_image_views);
+    }
+
+    free(swapchain_images);
+
+    ext_func->vkDestroySwapchainKHR(logical_device, swapchain, NULL);
+}

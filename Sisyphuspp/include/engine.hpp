@@ -1,7 +1,6 @@
 #ifndef _SISYPHUSPP_ENGINE_HPP
 #define _SISYPHUSPP_ENGINE_HPP
 
-#include "engine.h"
 #include <memory>
 #include "window.hpp"
 #include "utils.hpp"
@@ -10,9 +9,10 @@
 #include "renderer.hpp"
 #include "camera.hpp"
 #include "object.hpp"
+#include "export.hpp"
 
 namespace Sisyphus {
-    class Engine {
+    class SSP_API Engine {
         public:
             Engine(Config &config);
             ~Engine();

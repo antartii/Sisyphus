@@ -21,10 +21,9 @@ bool ssp_engine_run(struct SSPEngine *pEngine)
 {
     if (!pEngine->window->should_close
         && ssp_window_run(pEngine->window)
-        && (ssp_renderer_draw_frame(pEngine->renderer, pEngine->window) == SSP_ERROR_CODE_SUCCESS)) {
+        && (ssp_vulkan_draw_frame(&pEngine->renderer->vulkan_context, pEngine->window, pEngine->renderer->objects_to_draw) == SSP_ERROR_CODE_SUCCESS)) {
             return true;
     }
-
     ssp_renderer_stop(pEngine->renderer);
 
     return false;
@@ -58,7 +57,7 @@ struct SSPEngine *ssp_engine_create(struct SSPConfig *config, enum SSP_ERROR_COD
 
 void ssp_engine_draw(struct SSPEngine *pEngine, struct SSPObject *object)
 {
-    ssp_dynamic_array_push(pEngine->renderer->objects_to_draw, object);
+    ssp_dynamic_array_push(pEngine->renderer->objects_to_draw, &object);
 }
 
 void ssp_engine_destroy(struct SSPEngine *pEngine)
