@@ -34,7 +34,7 @@ namespace Sisyphus {
 
         _renderer.dataVulkanContext()->cameraData = data;
 
-        ssp_vulkan_update_proj(camera.data(), _renderer.dataVulkanContext()->uniform_buffers_mapped, _renderer.dataVulkanContext()->swapchain_extent);
-        ssp_vulkan_update_view(camera.data(), _renderer.dataVulkanContext()->uniform_buffers_mapped);
+        ssp_vulkan_update_proj(camera.data(), &_renderer.dataVulkanContext()->pipeline_context, _renderer.dataVulkanContext()->swapchain.extent);
+        ssp_vulkan_update_view(camera.data(), &_renderer.dataVulkanContext()->pipeline_context);
     }
 }

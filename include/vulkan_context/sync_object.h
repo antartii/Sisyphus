@@ -6,18 +6,14 @@
 #include "errors.h"
 #include "graphic.h"
 #include "ext_func.h"
+#include "device.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum SSP_ERROR_CODE ssp_vulkan_create_sync_objects(struct SSPVulkanContextExtFunc *ext_func,
-    VkSemaphore **present_complete_semaphores,
-    VkSemaphore **render_finished_semaphores,
-    VkFence **frames_in_flight_fences,
-    VkDevice logical_device,
-    VkFence *transfer_copy_buffer_fence,
-    VkFence *transfer_copy_buffer_to_image_fence);
+enum SSP_ERROR_CODE ssp_vulkan_create_sync_objects(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device);
+enum SSP_ERROR_CODE ssp_vulkan_sync_objects_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device);
 
 #ifdef __cplusplus
 }

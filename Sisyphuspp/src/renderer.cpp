@@ -15,7 +15,7 @@ namespace Sisyphus {
 
     void Renderer::stop()
     {
-        vkDeviceWaitIdle(_renderer->vulkan_context.logical_device);
+        vkDeviceWaitIdle(_renderer->vulkan_context.device.logical_device);
     }
 
     struct SSPRenderer *Renderer::data()

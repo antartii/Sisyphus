@@ -15,8 +15,11 @@ struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos
 
     object->status = SSP_OBJECT_NOT_INITIALISED;
 
-    if (ssp_vulkan_create_vertex_buffer(&engine->renderer->vulkan_context, &object->vertex_buffer, &object->vertex_memory, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
-        || !ssp_vulkan_create_index_buffer(&engine->renderer->vulkan_context, &object->index_buffer, &object->index_memory, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
+    struct SSPVulkanContext *context = &engine->renderer->vulkan_context;
+    struct SSPVulkanContextExtFunc *ext_func = &context->ext_func;
+
+    if (ssp_vulkan_create_vertex_buffer(ext_func, &context->device, &context->command_context, &object->vertex_buffer, &object->vertex_memory, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
+        || !ssp_vulkan_create_index_buffer(ext_func, &context->device, &context->command_context, &object->index_buffer, &object->index_memory, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
         free(vertices);
         free(object);
         return NULL;
@@ -30,12 +33,13 @@ void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object)
 {
     struct SSPVulkanContext *context = &engine->renderer->vulkan_context;
     struct SSPVulkanContextExtFunc *ext_func = &context->ext_func;
+    VkDevice logical_device = context->device.logical_device;
 
-    ext_func->vkDestroyBuffer(context->logical_device, object->vertex_buffer, NULL);
-    ext_func->vkFreeMemory(context->logical_device, object->vertex_memory, NULL);
+    ext_func->vkDestroyBuffer(logical_device, object->vertex_buffer, NULL);
+    ext_func->vkFreeMemory(logical_device, object->vertex_memory, NULL);
 
-    ext_func->vkDestroyBuffer(context->logical_device, object->index_buffer, NULL);
-    ext_func->vkFreeMemory(context->logical_device, object->index_memory, NULL);
+    ext_func->vkDestroyBuffer(logical_device, object->index_buffer, NULL);
+    ext_func->vkFreeMemory(logical_device, object->index_memory, NULL);
 
     free(object);
 }

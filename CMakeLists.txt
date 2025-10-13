@@ -112,9 +112,7 @@ add_library(${PROJECT_NAME} ${C_LIB_TYPE}
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/instance.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/debug.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/surface.c
-    ${PROJECT_SOURCE_DIR}/src/vulkan_context/physical_device.c
-    ${PROJECT_SOURCE_DIR}/src/vulkan_context/logical_device.c
-    ${PROJECT_SOURCE_DIR}/src/vulkan_context/queue.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/device.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/swapchain.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/graphic.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/command_buffer.c

@@ -12,7 +12,7 @@ enum SSP_ERROR_CODE ssp_renderer_destroy(struct SSPRenderer *pRenderer)
 
 enum SSP_ERROR_CODE ssp_renderer_stop(struct SSPRenderer *pRenderer)
 {
-    vkDeviceWaitIdle(pRenderer->vulkan_context.logical_device);
+    vkDeviceWaitIdle(pRenderer->vulkan_context.device.logical_device);
 }
 
 enum SSP_ERROR_CODE ssp_renderer_create(struct SSPRenderer *pRenderer, struct SSPWindow *window, struct SSPConfig *config)

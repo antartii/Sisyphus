@@ -24,8 +24,8 @@ void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera)
     pEngine->renderer->vulkan_context.cameraData = camera;
     struct SSPVulkanContext *context = &pEngine->renderer->vulkan_context;
 
-    ssp_vulkan_update_proj(camera, context->uniform_buffers_mapped, context->swapchain_extent);
-    ssp_vulkan_update_view(camera, context->uniform_buffers_mapped);
+    ssp_vulkan_update_proj(camera, &context->pipeline_context, context->swapchain.extent);
+    ssp_vulkan_update_view(camera, &context->pipeline_context);
 }
 
 void ssp_camera_destroy(struct SSPCamera *camera)

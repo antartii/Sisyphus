@@ -21,8 +21,11 @@ namespace Sisyphus {
             vertices[i].pos[1] = verticesPos[i].y;
         }
 
-        if (ssp_vulkan_create_vertex_buffer(engine.getRenderer().dataVulkanContext(), &_object->vertex_buffer, &_object->vertex_memory, vertices.data(), verticesCount) != SSP_ERROR_CODE_SUCCESS
-            || ssp_vulkan_create_index_buffer(engine.getRenderer().dataVulkanContext(), &_object->index_buffer, &_object->index_memory, indices.data(), _object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
+        SSPVulkanContext *vulkan_context = engine.getRenderer().dataVulkanContext();
+        SSPVulkanContextExtFunc *ext_func = &vulkan_context->ext_func;
+
+        if (ssp_vulkan_create_vertex_buffer(ext_func, &vulkan_context->device, &vulkan_context->command_context, &_object->vertex_buffer, &_object->vertex_memory, vertices.data(), verticesCount) != SSP_ERROR_CODE_SUCCESS
+            || ssp_vulkan_create_index_buffer(ext_func, &vulkan_context->device, &vulkan_context->command_context, &_object->index_buffer, &_object->index_memory, indices.data(), _object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
             std::cerr << "Couldn't create object, object address : " << this << std::endl;
         }
     }
@@ -31,12 +34,13 @@ namespace Sisyphus {
     {
         struct SSPVulkanContext *context = &engine.getRenderer().data()->vulkan_context;
         struct SSPVulkanContextExtFunc *ext_func = &context->ext_func;
+        VkDevice logical_device = context->device.logical_device;
 
-        ext_func->vkDestroyBuffer(context->logical_device, _object->vertex_buffer, NULL);
-        ext_func->vkFreeMemory(context->logical_device, _object->vertex_memory, NULL);
+        ext_func->vkDestroyBuffer(logical_device, _object->vertex_buffer, NULL);
+        ext_func->vkFreeMemory(logical_device, _object->vertex_memory, NULL);
 
-        ext_func->vkDestroyBuffer(context->logical_device, _object->index_buffer, NULL);
-        ext_func->vkFreeMemory(context->logical_device, _object->index_memory, NULL);
+        ext_func->vkDestroyBuffer(logical_device, _object->index_buffer, NULL);
+        ext_func->vkFreeMemory(logical_device, _object->index_memory, NULL);
     }
 
     Object::~Object()

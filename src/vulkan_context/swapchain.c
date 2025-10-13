@@ -48,27 +48,16 @@ static VkExtent2D ssp_vulkan_swapchain_choose_extent(VkExtent2D current_extent, 
     return current_extent;
 }
 
-enum SSP_ERROR_CODE ssp_vulkan_create_swapchain(
-    struct SSPVulkanContextExtFunc *ext_func,
-    VkPhysicalDevice physical_device,
-    VkDevice logical_device,
-    VkSurfaceKHR surface,
-    struct SSPWindow *window,
-    VkFormat *swapchain_image_format, 
-    VkExtent2D *swapchain_extent,
-    struct SSPVulkanQueueFamiliesIndices queue_family_indices,
-    VkSwapchainKHR *swapchain,
-    int *swapchain_images_count,
-    VkImage **swapchain_images)
+enum SSP_ERROR_CODE ssp_vulkan_create_swapchain(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanSwapchain *swapchain, struct SSPVulkanDevice *device, VkSurfaceKHR surface, struct SSPWindow *window)
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
-    ext_func->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &surface_capabilities);
+    ext_func->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physical_device, surface, &surface_capabilities);
 
-    VkSurfaceFormatKHR surface_format = ssp_vulkan_swapchain_choose_format(ext_func, physical_device, surface);
-    *swapchain_image_format = surface_format.format;
-    VkPresentModeKHR present_mode = ssp_vulkan_swapchain_choose_present_mode(ext_func, physical_device, surface);
-    *swapchain_extent = ssp_vulkan_swapchain_choose_extent(surface_capabilities.currentExtent, surface_capabilities.minImageExtent, surface_capabilities.maxImageExtent, window);
-    if (swapchain_extent->width == 0 || swapchain_extent->height == 0)
+    VkSurfaceFormatKHR surface_format = ssp_vulkan_swapchain_choose_format(ext_func, device->physical_device, surface);
+    swapchain->format = surface_format.format;
+    VkPresentModeKHR present_mode = ssp_vulkan_swapchain_choose_present_mode(ext_func, device->physical_device, surface);
+    swapchain->extent = ssp_vulkan_swapchain_choose_extent(surface_capabilities.currentExtent, surface_capabilities.minImageExtent, surface_capabilities.maxImageExtent, window);
+    if (swapchain->extent.width == 0 || swapchain->extent.height == 0)
         return SSP_ERROR_CODE_VULKAN_SWAPCHAIN_EXTENT;
     
     VkCompositeAlphaFlagBitsKHR composite_alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -83,46 +72,41 @@ enum SSP_ERROR_CODE ssp_vulkan_create_swapchain(
     create_info.compositeAlpha = composite_alpha;
     create_info.imageArrayLayers = 1;
     create_info.imageColorSpace = surface_format.colorSpace;
-    create_info.imageExtent = *swapchain_extent;
-    create_info.imageFormat = *swapchain_image_format;
+    create_info.imageExtent = swapchain->extent;
+    create_info.imageFormat = swapchain->format;
     create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     create_info.minImageCount = surface_capabilities.minImageCount;
     create_info.presentMode = present_mode;
     create_info.preTransform = surface_capabilities.currentTransform;
 
-    if (queue_family_indices.graphic == queue_family_indices.present)
+    if (device->queue_family_indices.graphic == device->queue_family_indices.present)
         create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     else {
-        uint32_t queue_family_indices_arr[] = {queue_family_indices.graphic, queue_family_indices.present};
+        uint32_t queue_family_indices_arr[] = {device->queue_family_indices.graphic, device->queue_family_indices.present};
         create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         create_info.pQueueFamilyIndices = queue_family_indices_arr;
         create_info.queueFamilyIndexCount = 2;
     }
 
-    if (ext_func->vkCreateSwapchainKHR(logical_device, &create_info, NULL, swapchain) != VK_SUCCESS)
+    if (ext_func->vkCreateSwapchainKHR(device->logical_device, &create_info, NULL, &swapchain->vk_swapchain) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_SWAPCHAIN_CREATION;
 
-    *swapchain_images_count = surface_capabilities.minImageCount;
-    *swapchain_images = calloc(*swapchain_images_count, sizeof(VkImage));
-    ext_func->vkGetSwapchainImagesKHR(logical_device, *swapchain, swapchain_images_count, *swapchain_images);
+    swapchain->images_count = surface_capabilities.minImageCount;
+    swapchain->images = calloc(swapchain->images_count, sizeof(VkImage));
+    ext_func->vkGetSwapchainImagesKHR(device->logical_device, swapchain->vk_swapchain, &swapchain->images_count, swapchain->images);
 
     return SSP_ERROR_CODE_SUCCESS;
 }
 
-enum SSP_ERROR_CODE ssp_vulkan_swapchain_destroy(struct SSPVulkanContextExtFunc *ext_func,
-    VkImageView *swapchain_image_views,
-    int swapchain_images_count,
-    VkImage *swapchain_images,
-    VkDevice logical_device,
-    VkSwapchainKHR swapchain)
+enum SSP_ERROR_CODE ssp_vulkan_swapchain_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanSwapchain *swapchain, struct SSPVulkanDevice *device)
 {
-    if (swapchain_image_views) {
-        for (int i = 0; i < swapchain_images_count; ++i)
-            ext_func->vkDestroyImageView(logical_device, swapchain_image_views[i], NULL);
-        free(swapchain_image_views);
+    if (swapchain->image_views) {
+        for (int i = 0; i < swapchain->images_count; ++i)
+            ext_func->vkDestroyImageView(device->logical_device, swapchain->image_views[i], NULL);
+        free(swapchain->image_views);
     }
 
-    free(swapchain_images);
+    free(swapchain->images);
 
-    ext_func->vkDestroySwapchainKHR(logical_device, swapchain, NULL);
+    ext_func->vkDestroySwapchainKHR(device->logical_device, swapchain->vk_swapchain, NULL);
 }
