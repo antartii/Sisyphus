@@ -31,6 +31,7 @@ struct SSPVulkanPipelineContext {
     void **uniform_buffers_mapped;
 
     int image_index;
+    int current_frame;
 };
 
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_set_layout(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context);
@@ -42,8 +43,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_sets(struct SSPVulkanContextExt
 enum SSP_ERROR_CODE ssp_vulkan_update_descriptor_sets(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device);
 enum SSP_ERROR_CODE ssp_vulkan_create_image(
     struct SSPVulkanContextExtFunc *ext_func,
-    VkDevice logical_device,
-    VkPhysicalDevice physical_device,
+    struct SSPVulkanDevice *device,
     uint32_t width,
     uint32_t height,
     VkFormat format,
@@ -60,7 +60,6 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
     struct SSPVulkanSwapchain *swapchain,
     struct SSPVulkanCommandContext *command_context,
     struct SSPVulkanPipelineContext *pipeline_context,
-    int current_frame,
     struct SSPDynamicArray *objects_to_draw);
 enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
     struct SSPVulkanContextExtFunc *ext_func,
@@ -75,7 +74,7 @@ enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
     uint32_t src_queue_family_index,
     uint32_t dst_queue_family_index);
 
-enum SSP_ERROR_CODE ssp_vulkan_pipeline_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, VkDevice logical_device);
+enum SSP_ERROR_CODE ssp_vulkan_pipeline_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, VkDevice device);
 
 #ifdef __cplusplus
 }

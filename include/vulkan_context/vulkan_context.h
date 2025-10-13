@@ -42,8 +42,6 @@ struct SSPVulkanContext {
     VkDebugUtilsMessengerEXT debug_messenger;
     #endif
 
-    int current_frame;
-
     struct SSPVulkanContextExtFunc ext_func;
 };
 

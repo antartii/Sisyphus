@@ -295,8 +295,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_graphic_pipeline(struct SSPVulkanContextEx
 
 enum SSP_ERROR_CODE ssp_vulkan_create_image(
     struct SSPVulkanContextExtFunc *ext_func,
-    VkDevice logical_device,
-    VkPhysicalDevice physical_device,
+    struct SSPVulkanDevice *device,
     uint32_t width,
     uint32_t height,
     VkFormat format,
@@ -321,18 +320,18 @@ enum SSP_ERROR_CODE ssp_vulkan_create_image(
     create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     create_info.samples = VK_SAMPLE_COUNT_1_BIT;
 
-    ext_func->vkCreateImage(logical_device, &create_info, NULL, image);
+    ext_func->vkCreateImage(device->logical_device, &create_info, NULL, image);
 
     VkMemoryRequirements mem_requirements;
-    ext_func->vkGetImageMemoryRequirements(logical_device, *image, &mem_requirements);
+    ext_func->vkGetImageMemoryRequirements(device->logical_device, *image, &mem_requirements);
 
     VkMemoryAllocateInfo alloc_info = {0};
     alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     alloc_info.allocationSize = mem_requirements.size;
-    alloc_info.memoryTypeIndex = ssp_vulkan_find_memory_type(ext_func, physical_device, mem_requirements.memoryTypeBits, properties);
+    alloc_info.memoryTypeIndex = ssp_vulkan_find_memory_type(ext_func, device->physical_device, mem_requirements.memoryTypeBits, properties);
 
-    ext_func->vkAllocateMemory(logical_device, &alloc_info, NULL, image_memory);
-    ext_func->vkBindImageMemory(logical_device, *image, *image_memory, 0);
+    ext_func->vkAllocateMemory(device->logical_device, &alloc_info, NULL, image_memory);
+    ext_func->vkBindImageMemory(device->logical_device, *image, *image_memory, 0);
 
     return SSP_ERROR_CODE_SUCCESS;
 }
@@ -404,9 +403,9 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
     struct SSPVulkanSwapchain *swapchain,
     struct SSPVulkanCommandContext *command_context,
     struct SSPVulkanPipelineContext *pipeline_context,
-    int current_frame,
     struct SSPDynamicArray *objects_to_draw)
 {
+    int current_frame = pipeline_context->current_frame;
     ext_func->vkResetCommandBuffer(command_context->graphic_command_buffers[current_frame], VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
     VkCommandBufferBeginInfo begin_info = {0};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

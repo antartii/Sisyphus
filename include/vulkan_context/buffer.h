@@ -24,7 +24,7 @@ void ssp_vulkan_stage_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SS
 enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, VkBuffer *buffer, VkDeviceMemory *memory, struct SSPShaderVertex *vertices, uint32_t vertices_count);
 enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, VkBuffer *buffer, VkDeviceMemory *memory, uint16_t *indices, uint32_t indices_count);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_queue_push(struct SSPDynamicArray *transfer_copy_buffer_queue, VkBuffer *dst_buffer, VkBuffer src_buffer, VkDeviceMemory src_memory, VkDeviceSize size, enum SSP_VULKAN_COPY_BUFFER_POST_PROCESS prost_process_flags);
-enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, VkFence *transfer_copy_buffer_fence);
+enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device);
 
 #ifdef __cplusplus
     }

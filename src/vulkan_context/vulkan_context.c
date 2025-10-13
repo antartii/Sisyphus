@@ -27,46 +27,47 @@ enum SSP_ERROR_CODE ssp_vulkan_draw_frame(struct SSPVulkanContext *pContext, str
     struct SSPVulkanContextExtFunc *ext_func = &pContext->ext_func;
     struct SSPVulkanDevice *device = &pContext->device;
     struct SSPVulkanCommandContext *command_context = &pContext->command_context;
+    struct SSPVulkanPipelineContext *pipeline_context = &pContext->pipeline_context;
     bool resize_after_present = false;
     
-    ssp_vulkan_copy_buffer_round(ext_func, &pContext->command_context, device, &command_context->transfer_copy_buffer_fence);
+    ssp_vulkan_copy_buffer_round(ext_func, &pContext->command_context, device);
 
-    ext_func->vkWaitForFences(device->logical_device, 1, &(command_context->frames_in_flight_fences[pContext->current_frame]), VK_TRUE, UINT64_MAX);
+    ext_func->vkWaitForFences(device->logical_device, 1, &(command_context->frames_in_flight_fences[pipeline_context->current_frame]), VK_TRUE, UINT64_MAX);
 
     if (window->resize_needed)
         return ssp_vulkan_resize(pContext, window);
 
-    VkResult result = ext_func->vkAcquireNextImageKHR(device->logical_device, pContext->swapchain.vk_swapchain, UINT64_MAX, command_context->present_complete_semaphores[pContext->current_frame], NULL, &pContext->pipeline_context.image_index);
+    VkResult result = ext_func->vkAcquireNextImageKHR(device->logical_device, pContext->swapchain.vk_swapchain, UINT64_MAX, command_context->present_complete_semaphores[pipeline_context->current_frame], NULL, &pipeline_context->image_index);
     
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
         return ssp_vulkan_resize(pContext, window);
     else if (result == VK_SUBOPTIMAL_KHR)
         resize_after_present = true;
 
-    ssp_vulkan_record_graphic_command_buffer(ext_func, &pContext->swapchain, &pContext->command_context, &pContext->pipeline_context ,pContext->current_frame, objects_to_draw);
+    ssp_vulkan_record_graphic_command_buffer(ext_func, &pContext->swapchain, &pContext->command_context, pipeline_context, objects_to_draw);
 
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 
     VkSubmitInfo submit_info = {0};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.pCommandBuffers = &(pContext->command_context.graphic_command_buffers[pContext->current_frame]);
+    submit_info.pCommandBuffers = &(pContext->command_context.graphic_command_buffers[pipeline_context->current_frame]);
     submit_info.commandBufferCount = 1;
-    submit_info.pSignalSemaphores = &(command_context->render_finished_semaphores[pContext->current_frame]);
+    submit_info.pSignalSemaphores = &(command_context->render_finished_semaphores[pipeline_context->current_frame]);
     submit_info.signalSemaphoreCount = 1;
-    submit_info.pWaitSemaphores = &(command_context->present_complete_semaphores[pContext->current_frame]);
+    submit_info.pWaitSemaphores = &(command_context->present_complete_semaphores[pipeline_context->current_frame]);
     submit_info.waitSemaphoreCount = 1;
     submit_info.pWaitDstStageMask = wait_stages;
 
-    ext_func->vkResetFences(device->logical_device, 1, &(command_context->frames_in_flight_fences[pContext->current_frame]));
-    ext_func->vkQueueSubmit(device->graphic_queue, 1, &submit_info, command_context->frames_in_flight_fences[pContext->current_frame]);
+    ext_func->vkResetFences(device->logical_device, 1, &(command_context->frames_in_flight_fences[pipeline_context->current_frame]));
+    ext_func->vkQueueSubmit(device->graphic_queue, 1, &submit_info, command_context->frames_in_flight_fences[pipeline_context->current_frame]);
 
     VkPresentInfoKHR present_info = {0};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
-    present_info.pWaitSemaphores = &(command_context->render_finished_semaphores[pContext->current_frame]);
+    present_info.pWaitSemaphores = &(command_context->render_finished_semaphores[pipeline_context->current_frame]);
     present_info.swapchainCount = 1;
     present_info.pSwapchains = &pContext->swapchain.vk_swapchain;
-    present_info.pImageIndices = &pContext->pipeline_context.image_index;
+    present_info.pImageIndices = &pipeline_context->image_index;
 
     result = ext_func->vkQueuePresentKHR(device->present_queue, &present_info);
 
@@ -76,7 +77,7 @@ enum SSP_ERROR_CODE ssp_vulkan_draw_frame(struct SSPVulkanContext *pContext, str
         || resize_after_present)
         ssp_vulkan_resize(pContext, window);
 
-    pContext->current_frame = (pContext->current_frame + 1) % SSP_MAX_FRAMES_IN_FLIGHT;
+    pipeline_context->current_frame = (pipeline_context->current_frame + 1) % SSP_MAX_FRAMES_IN_FLIGHT;
 
     return SSP_ERROR_CODE_SUCCESS;
 }

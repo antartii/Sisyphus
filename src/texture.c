@@ -29,8 +29,7 @@ struct SSPTexture *spp_texture_create(struct SSPEngine *engine, const char *path
 
     ssp_vulkan_create_image(
         ext_func,
-        context->logical_device,
-        context->physical_device,
+        &context->device,
         texture->width, texture->height,
         VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_TILING_OPTIMAL,

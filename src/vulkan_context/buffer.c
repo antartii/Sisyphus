@@ -119,7 +119,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_to_image_queue_push(struct SSPVulkanC
     ext_func->vkResetCommandBuffer(command_buffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
 }*/
 
-enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, VkFence *transfer_copy_buffer_fence)
+enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device)
 {
     if (command_context->transfer_copy_buffer_queue->size == 0)
         return SSP_ERROR_CODE_SUCCESS;
@@ -171,10 +171,10 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc 
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &(command_buffer);
 
-    ext_func->vkResetFences(device->logical_device, 1, transfer_copy_buffer_fence);
-    ext_func->vkQueueSubmit(device->transfer_queue, 1, &submit_info, *transfer_copy_buffer_fence);
+    ext_func->vkResetFences(device->logical_device, 1, &command_context->transfer_copy_buffer_fence);
+    ext_func->vkQueueSubmit(device->transfer_queue, 1, &submit_info, command_context->transfer_copy_buffer_fence);
 
-    ext_func->vkWaitForFences(device->logical_device, 1, transfer_copy_buffer_fence, VK_TRUE, UINT64_MAX); // need to change to not wait but check status fence
+    ext_func->vkWaitForFences(device->logical_device, 1, &command_context->transfer_copy_buffer_fence, VK_TRUE, UINT64_MAX); // need to change to not wait but check status fence
     ext_func->vkQueueWaitIdle(device->transfer_queue);
 
     for (size_t i = 0; i < command_context->transfer_copy_buffer_queue->size; ++i) {
