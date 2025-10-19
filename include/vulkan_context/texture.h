@@ -19,6 +19,7 @@ struct SSPTexture {
     VkDeviceSize image_size;
 
     VkImage image;
+    VkImageView image_view;
     VkDeviceMemory image_memory;
 };
 

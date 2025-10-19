@@ -42,7 +42,7 @@ struct SSPTexture *ssp_texture_create_from_context(struct SSPVulkanContext *pCon
 
     struct SSPVulkanCommandContext *command_context = &pContext->command_context;
     ssp_vulkan_copy_image_buffer_queue_push(command_context->transfer_copy_buffer_to_image_queue,
-        command_context, texture->image,
+        command_context, texture->image, &texture->image_view,
         texture->height, texture->width,
         0, 0,
         staging_buffer,
@@ -62,6 +62,7 @@ void ssp_texture_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPTex
 {
     ext_func->vkDestroyImage(device->logical_device, texture->image, NULL);
     ext_func->vkFreeMemory(device->logical_device, texture->image_memory, NULL);
+    ext_func->vkDestroyImageView(device->logical_device, texture->image_view, NULL);
 
     free(texture);
 }

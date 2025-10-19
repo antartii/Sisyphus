@@ -114,6 +114,10 @@ struct SSPVulkanContextExtFunc {
     PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR;
 
     PFN_vkGetSemaphoreCounterValueKHR vkGetSemaphoreCounterValueKHR;
+    PFN_vkCreateSampler vkCreateSampler;
+    PFN_vkDestroySampler vkDestroySampler;
+
+    PFN_vkGetPhysicalDeviceFeatures vkGetPhysicalDeviceFeatures;
 };
 
 enum SSP_ERROR_CODE ssp_vulkan_ext_func_instance_global(struct SSPVulkanContextExtFunc *ext_func);

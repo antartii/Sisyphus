@@ -26,6 +26,8 @@ struct SSPVulkanPipelineContext {
     VkPipelineLayout pipeline_layout;
     VkPipeline graphic_pipeline;
 
+    VkSampler texture_sampler;
+
     VkBuffer *uniform_buffers;
     VkDeviceMemory *uniform_buffers_memory;
     void **uniform_buffers_mapped;
@@ -37,7 +39,8 @@ struct SSPVulkanPipelineContext {
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_set_layout(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context);
 enum SSP_ERROR_CODE ssp_vulkan_create_graphic_pipeline(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device, struct SSPVulkanSwapchain *swapchain);
 enum SSP_ERROR_CODE ssp_vulkan_create_uniform_buffers(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device);
-enum SSP_ERROR_CODE ssp_vulkan_create_image_view(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanSwapchain *swapchain, struct SSPVulkanDevice *device);
+enum SSP_ERROR_CODE ssp_vulkan_create_image_view(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkFormat format, VkImage image, VkImageView *image_view);
+enum SSP_ERROR_CODE ssp_vulkan_swapchain_create_image_views(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanSwapchain *swapchain, struct SSPVulkanDevice *device);
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_pool(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context);
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_sets(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device);
 enum SSP_ERROR_CODE ssp_vulkan_update_descriptor_sets(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device);
@@ -76,6 +79,7 @@ struct SSPVulkanTransitionImageLayoutInfo {
 };
 
 enum SSP_ERROR_CODE ssp_vulkan_pipeline_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, VkDevice device);
+enum SSP_ERROR_CODE ssp_vulkan_texture_sampler_create(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device);
 
 #ifdef __cplusplus
 }

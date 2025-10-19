@@ -1,4 +1,5 @@
 #include "vulkan_context/buffer.h"
+#include "vulkan_context/graphic.h"
 
 enum SSP_ERROR_CODE ssp_vulkan_create_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkMemoryPropertyFlags memory_properties, VkBuffer *buffer, VkDeviceMemory *memory)
 {
@@ -82,6 +83,8 @@ static enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_post_processes(str
         
         data->image.state = SSP_VULKAN_BUFFER_STATE_READY;
 
+        ssp_vulkan_create_image_view(ext_func, device, VK_FORMAT_R8G8B8A8_SRGB, data->image.image, data->image.image_view);
+
         if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER)
             ext_func->vkDestroyBuffer(device->logical_device, data->src_buffer, NULL);
         if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_FREE_SRC_MEMORY)
@@ -140,7 +143,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanCon
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
             VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-            command_buffer, VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED);
+            command_buffer, device->queue_family_indices.transfer, device->queue_family_indices.graphic);
     }
 
     vkEndCommandBuffer(command_buffer);
@@ -176,6 +179,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanCon
 enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArray *transfer_transition_queue,
     struct SSPVulkanCommandContext *command_context,
     VkImage image,
+    VkImageView *image_view,
     uint32_t height,
     uint32_t width,
     int offsetX,
@@ -189,6 +193,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArr
     data.height = height;
     data.width = width;
     data.image.image = image;
+    data.image.image_view = image_view;
     data.image.queue_batch = command_context->transfer_image_semaphore_value + 1;
     data.image.state = SSP_VULKAN_BUFFER_STATE_NOT_INITIALIZED;
     data.image_layout = image_layout;
@@ -226,16 +231,16 @@ static void ssp_vulkan_copy_buffer_post_processes(struct SSPVulkanContextExtFunc
             || command_context->curr_transfer_semaphore_value < data->dst_buffer->queue_batch) {
             ++i;
             continue;
-        } else {
-            data->dst_buffer->state = SSP_VULKAN_BUFFER_STATE_READY;
-
-            if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER)
-                ext_func->vkDestroyBuffer(device->logical_device, data->src_buffer, NULL);
-            if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_FREE_SRC_MEMORY)
-                ext_func->vkFreeMemory(device->logical_device, data->src_memory, NULL);
-
-            ssp_dynamic_array_replace(transfer_copy_buffer_queue, transfer_copy_buffer_queue->size - 1, i);
         }
+        data->dst_buffer->state = SSP_VULKAN_BUFFER_STATE_READY;
+
+        if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER)
+            ext_func->vkDestroyBuffer(device->logical_device, data->src_buffer, NULL);
+        if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_FREE_SRC_MEMORY)
+            ext_func->vkFreeMemory(device->logical_device, data->src_memory, NULL);
+
+        ssp_dynamic_array_replace(transfer_copy_buffer_queue, transfer_copy_buffer_queue->size - 1, i);
+        
     }
 }
 

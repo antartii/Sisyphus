@@ -48,6 +48,7 @@ struct SSPVulkanCopyBufferData {
 
 struct SSPVulkanImage {
     VkImage image;
+    VkImageView *image_view;
 
     enum SSP_VULKAN_BUFFER_STATE state;
     uint64_t queue_batch;
@@ -91,6 +92,7 @@ enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
 enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArray *transfer_transition_queue,
     struct SSPVulkanCommandContext *command_context,
     VkImage image,
+    VkImageView *image_view,
     uint32_t height,
     uint32_t width,
     int offsetX,

@@ -101,7 +101,22 @@ enum SSP_ERROR_CODE ssp_vulkan_create_uniform_buffers(struct SSPVulkanContextExt
     return SSP_ERROR_CODE_SUCCESS;
 }
 
-enum SSP_ERROR_CODE ssp_vulkan_create_image_view(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanSwapchain *swapchain, struct SSPVulkanDevice *device)
+enum SSP_ERROR_CODE ssp_vulkan_swapchain_create_image_views(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanSwapchain *swapchain, struct SSPVulkanDevice *device)
+{
+    enum SSP_ERROR_CODE err_code;
+    swapchain->image_views = calloc(swapchain->images_count, sizeof(VkImageView));
+    
+    for (int i = 0; i < swapchain->images_count; ++i) {
+        err_code = ssp_vulkan_create_image_view(ext_func, device, swapchain->format, swapchain->images[i], &(swapchain->image_views[i]));
+
+        if (err_code != SSP_ERROR_CODE_SUCCESS)
+            return err_code;
+    }
+
+    return SSP_ERROR_CODE_SUCCESS;
+}
+
+enum SSP_ERROR_CODE ssp_vulkan_create_image_view(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkFormat format, VkImage image, VkImageView *image_view)
 {
     VkImageViewCreateInfo create_info = {0};
     create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -109,20 +124,17 @@ enum SSP_ERROR_CODE ssp_vulkan_create_image_view(struct SSPVulkanContextExtFunc 
     create_info.components.r = VK_COMPONENT_SWIZZLE_R;
     create_info.components.g = VK_COMPONENT_SWIZZLE_G;
     create_info.components.b = VK_COMPONENT_SWIZZLE_B;
-    create_info.format = swapchain->format;
+    create_info.format = format;
     create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     create_info.subresourceRange.baseMipLevel = 0;
     create_info.subresourceRange.levelCount = 1;
     create_info.subresourceRange.baseArrayLayer = 0;
     create_info.subresourceRange.layerCount = 1;
     create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    create_info.image = image;
 
-    swapchain->image_views = calloc(swapchain->images_count, sizeof(VkImageView));
-    for (int i = 0; i < swapchain->images_count; ++i) {
-        create_info.image = swapchain->images[i];
-        if (ext_func->vkCreateImageView(device->logical_device, &create_info, NULL, &(swapchain->image_views[i])) != VK_SUCCESS)
-            return SSP_ERROR_CODE_VULKAN_CREATE_IMAGE_VIEW;
-    }
+    if (ext_func->vkCreateImageView(device->logical_device, &create_info, NULL, image_view) != VK_SUCCESS)
+        return SSP_ERROR_CODE_VULKAN_CREATE_IMAGE_VIEW;
 
     return SSP_ERROR_CODE_SUCCESS;
 }
@@ -457,4 +469,29 @@ enum SSP_ERROR_CODE ssp_vulkan_pipeline_destroy(struct SSPVulkanContextExtFunc *
             ext_func->vkDestroyBuffer(logical_device, pipeline_context->uniform_buffers[i], NULL);
         free(pipeline_context->uniform_buffers);
     }
+
+    ext_func->vkDestroySampler(logical_device, pipeline_context->texture_sampler, NULL);
+}
+
+enum SSP_ERROR_CODE ssp_vulkan_texture_sampler_create(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device)
+{
+    VkPhysicalDeviceProperties properties;
+    ext_func->vkGetPhysicalDeviceProperties(device->physical_device, &properties);
+
+    VkSamplerCreateInfo create_info = {0};
+    create_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    create_info.magFilter = VK_FILTER_LINEAR;
+    create_info.minFilter = VK_FILTER_LINEAR;
+    create_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    create_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+    create_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+    create_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+    create_info.anisotropyEnable = VK_TRUE;
+    create_info.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+    create_info.compareEnable = VK_FALSE;
+    create_info.compareOp = VK_COMPARE_OP_ALWAYS;
+    create_info.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+    create_info.unnormalizedCoordinates = VK_FALSE;
+
+    ext_func->vkCreateSampler(device->logical_device, &create_info, NULL, &pipeline_context->texture_sampler);
 }

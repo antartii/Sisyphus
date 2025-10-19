@@ -1,11 +1,12 @@
 #include "vulkan_context/ext_func.h"
+#include <unistd.h>
 
 enum SSP_ERROR_CODE ssp_vulkan_ext_func_instance_global(struct SSPVulkanContextExtFunc *ext_func)
 {
     ext_func->vkCreateInstance = (PFN_vkCreateInstance) vkGetInstanceProcAddr(NULL, "vkCreateInstance");
     ext_func->vkEnumerateInstanceVersion = (PFN_vkEnumerateInstanceVersion) vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceVersion");
     ext_func->vkEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties) vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceLayerProperties");
-    ext_func->vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties) vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceExtensionProperties");    
+    ext_func->vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties) vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceExtensionProperties");
 
     return SSP_ERROR_CODE_SUCCESS;
 }
@@ -29,6 +30,7 @@ enum SSP_ERROR_CODE ssp_vulkan_ext_func_instance_nglobal(struct SSPVulkanContext
     ext_func->vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR) vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
     ext_func->vkGetPhysicalDeviceSurfaceFormatsKHR = (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR) vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceSurfaceFormatsKHR");
     ext_func->vkGetPhysicalDeviceMemoryProperties = (PFN_vkGetPhysicalDeviceMemoryProperties) vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceMemoryProperties");
+    ext_func->vkGetPhysicalDeviceFeatures = (PFN_vkGetPhysicalDeviceFeatures) vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFeatures");
 
     return SSP_ERROR_CODE_SUCCESS;
 }
@@ -108,6 +110,8 @@ enum SSP_ERROR_CODE ssp_vulkan_ext_func_device(struct SSPVulkanContextExtFunc *e
 
     ext_func->vkCmdPipelineBarrier = (PFN_vkCmdPipelineBarrier) vkGetDeviceProcAddr(logical_device, "vkCmdPipelineBarrier");
     ext_func->vkGetSemaphoreCounterValueKHR = (PFN_vkGetSemaphoreCounterValueKHR) vkGetDeviceProcAddr(logical_device, "vkGetSemaphoreCounterValueKHR");
+    ext_func->vkCreateSampler = (PFN_vkCreateSampler) vkGetDeviceProcAddr(logical_device, "vkCreateSampler");
+    ext_func->vkDestroySampler = (PFN_vkDestroySampler) vkGetDeviceProcAddr(logical_device, "vkDestroySampler");
 
     return SSP_ERROR_CODE_SUCCESS;
 }

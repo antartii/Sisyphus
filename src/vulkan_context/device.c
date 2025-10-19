@@ -46,6 +46,9 @@ enum SSP_ERROR_CODE ssp_vulkan_create_logical_device(struct SSPVulkanContextExtF
 
     free(queue_family_properties);
 
+    VkPhysicalDeviceFeatures physical_device_features = {0};
+    physical_device_features.samplerAnisotropy = VK_TRUE;
+
     VkPhysicalDeviceSynchronization2FeaturesKHR sync_2_features = {0};
     sync_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
     sync_2_features.synchronization2 = VK_TRUE;
@@ -66,6 +69,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_logical_device(struct SSPVulkanContextExtF
     create_info.pQueueCreateInfos = queue_create_info;
     create_info.enabledExtensionCount = ssp_vulkan_device_extensions_name_size;
     create_info.ppEnabledExtensionNames = ssp_vulkan_device_extensions_name;
+    create_info.pEnabledFeatures = &physical_device_features;
     create_info.pNext = &timeline_semaphores_features;
 
     if (ext_func->vkCreateDevice(device->physical_device, &create_info, NULL, &device->logical_device) != VK_SUCCESS)
@@ -101,16 +105,22 @@ static int ssp_vulkan_physical_device_score(VkPhysicalDevice physical_device, st
     int device_type_score;
     switch (properties.deviceType) {
         case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-            device_type_score = 3;
+            device_type_score = 30;
             break;
         case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-            device_type_score = 2;
+            device_type_score = 20;
             break;
         default:
-            device_type_score = 1;
+            device_type_score = 10;
             break;
     }
     score += device_type_score;
+
+    VkPhysicalDeviceFeatures features;
+    pExt_func->vkGetPhysicalDeviceFeatures(physical_device, &features);
+    if (features.samplerAnisotropy == VK_TRUE)
+        score += 1;
+
     return score;
 }
 

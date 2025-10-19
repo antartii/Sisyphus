@@ -22,5 +22,6 @@ namespace Sisyphus {
 
         ext_func->vkDestroyImage(logical_device, _data->image, NULL);
         ext_func->vkFreeMemory(logical_device, _data->image_memory, NULL);
+        ext_func->vkDestroyImageView(logical_device, _data->image_view, NULL);
     }
 }

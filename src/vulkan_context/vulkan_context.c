@@ -11,7 +11,7 @@ static enum SSP_ERROR_CODE ssp_vulkan_resize(struct SSPVulkanContext *pContext, 
         ssp_vulkan_swapchain_destroy(ext_func, swapchain, &pContext->device);
 
         ssp_vulkan_create_swapchain(ext_func, swapchain, &pContext->device, pContext->surface, window);
-        ssp_vulkan_create_image_view(ext_func, swapchain, &pContext->device);
+        ssp_vulkan_swapchain_create_image_views(ext_func, swapchain, &pContext->device);
 
         ssp_vulkan_update_proj(pContext->cameraData, &pContext->pipeline_context, swapchain->extent);
         ssp_vulkan_update_view(pContext->cameraData, &pContext->pipeline_context);
@@ -102,11 +102,12 @@ enum SSP_ERROR_CODE ssp_vulkan_context_init(struct SSPVulkanContext *pContext, s
         || (err_code = ssp_vulkan_create_graphic_pipeline(ext_func, &pContext->pipeline_context, &pContext->device, &pContext->swapchain))
         || (err_code = ssp_vulkan_create_command_pools(ext_func, &pContext->command_context, &pContext->device))
         || (err_code = ssp_vulkan_create_uniform_buffers(ext_func, &pContext->pipeline_context, &pContext->device))
-        || (err_code = ssp_vulkan_create_image_view(ext_func, &pContext->swapchain, &pContext->device))
+        || (err_code = ssp_vulkan_swapchain_create_image_views(ext_func, &pContext->swapchain, &pContext->device))
         || (err_code = ssp_vulkan_create_descriptor_pool(ext_func, &pContext->device, &pContext->pipeline_context))
         || (err_code = ssp_vulkan_create_descriptor_sets(ext_func, &pContext->pipeline_context, &pContext->device))
         || (err_code = ssp_vulkan_create_sync_objects(ext_func, &pContext->command_context, &pContext->device))
-        || (err_code = ssp_vulkan_allocate_command_buffers(ext_func, &pContext->command_context, &pContext->device));
+        || (err_code = ssp_vulkan_allocate_command_buffers(ext_func, &pContext->command_context, &pContext->device))
+        || (err_code = ssp_vulkan_texture_sampler_create(ext_func, &pContext->pipeline_context, &pContext->device));
 
     return err_code;
 }
