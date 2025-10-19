@@ -117,6 +117,7 @@ add_library(${PROJECT_NAME} ${C_LIB_TYPE}
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/graphic.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/command_buffer.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/sync_object.c
+    ${PROJECT_SOURCE_DIR}/src/vulkan_context/texture.c
 
     ${SURFACE_SRC}
 )

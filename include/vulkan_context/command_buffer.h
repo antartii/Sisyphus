@@ -20,19 +20,7 @@ extern "C" {
 #define SSP_TRANSFER_COMMAND_BUFFERS_COUNT 2
 #define SSP_DEFAULT_COPY_BUFFER_QUEUE_POOL_SIZE 5
 #define SSP_DEFAULT_COPY_BUFFER_TO_IMAGE_QUEUE_POOL_SIZE 5
-
-struct SSPVulkanCopyBufferData {
-    VkBuffer *dst_buffer;
-    VkDeviceSize size;
-    VkBuffer src_buffer;
-    VkDeviceMemory src_memory;
-
-    int post_process_bitmask;
-};
-
-struct SSPVulkanCopyBufferToImageData {
-
-};
+#define SSP_DEFAULT_TRANSITION_IMAGE_LAYOUT_QUEUE_POOL_SIZE 5
 
 struct SSPVulkanCommandContext {
     VkCommandPool *command_pools;
@@ -48,11 +36,19 @@ struct SSPVulkanCommandContext {
 
     struct SSPDynamicArray *transfer_copy_buffer_queue;
     struct SSPDynamicArray *transfer_copy_buffer_to_image_queue;
+    struct SSPDynamicArray *transfer_transition_image_layout_queue;
 
-    VkFence transfer_copy_buffer_fence;
-    VkFence transfer_copy_buffer_to_image_fence;
     VkSemaphore *present_complete_semaphores;
     VkSemaphore *render_finished_semaphores;
+
+    VkSemaphore transfer_semaphore_timeline;
+    uint64_t transfer_semaphore_timeline_value;
+    uint64_t curr_transfer_semaphore_value;
+
+    VkSemaphore transfer_image_semaphore_timeline;
+    uint64_t transfer_image_semaphore_value;
+    uint64_t curr_transfer_image_semaphore_value;
+
     VkFence *frames_in_flight_fences;
 };
 

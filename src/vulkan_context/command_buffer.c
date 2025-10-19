@@ -1,4 +1,6 @@
 #include "vulkan_context/command_buffer.h"
+#include "vulkan_context/buffer.h"
+#include "vulkan_context/graphic.h"
 
 enum SSP_ERROR_CODE ssp_vulkan_create_command_pools(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device)
 {
@@ -48,6 +50,7 @@ enum SSP_ERROR_CODE ssp_vulkan_allocate_command_buffers(struct SSPVulkanContextE
 
     command_context->transfer_copy_buffer_queue = ssp_dynamic_array_init(SSP_DEFAULT_COPY_BUFFER_QUEUE_POOL_SIZE, sizeof(struct SSPVulkanCopyBufferData), false);
     command_context->transfer_copy_buffer_to_image_queue = ssp_dynamic_array_init(SSP_DEFAULT_COPY_BUFFER_TO_IMAGE_QUEUE_POOL_SIZE, sizeof(struct SSPVulkanCopyBufferToImageData), false);
+    command_context->transfer_transition_image_layout_queue = ssp_dynamic_array_init(SSP_DEFAULT_TRANSITION_IMAGE_LAYOUT_QUEUE_POOL_SIZE, sizeof(struct SSPVulkanTransitionImageLayoutInfo), false);
 
     if (ext_func->vkAllocateCommandBuffers(device->logical_device, &alloc_info, command_context->transfer_command_buffers) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_COMMAND_BUFFER_ALLOCATION_TRANSFER;

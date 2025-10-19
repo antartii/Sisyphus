@@ -61,18 +61,19 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
     struct SSPVulkanCommandContext *command_context,
     struct SSPVulkanPipelineContext *pipeline_context,
     struct SSPDynamicArray *objects_to_draw);
-enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
-    struct SSPVulkanContextExtFunc *ext_func,
-    VkImage *image,
-    VkImageLayout old_layout,
-    VkImageLayout new_layout,
-    VkAccessFlags2 src_access_mask,
-    VkAccessFlags2 dst_access_mask,
-    VkPipelineStageFlags2 src_stage_mask,
-    VkPipelineStageFlags2 dst_stage_mask,
-    VkCommandBuffer command_buffer,
-    uint32_t src_queue_family_index,
-    uint32_t dst_queue_family_index);
+
+struct SSPVulkanTransitionImageLayoutInfo {
+    VkImage *image;
+    VkImageLayout old_layout;
+    VkImageLayout new_layout;
+    VkAccessFlags2 src_access_mask;
+    VkAccessFlags2 dst_access_mask;
+    VkPipelineStageFlags2 src_stage_mask;
+    VkPipelineStageFlags2 dst_stage_mask;
+    VkCommandBuffer command_buffer;
+    uint32_t src_queue_family_index;
+    uint32_t dst_queue_family_index;
+};
 
 enum SSP_ERROR_CODE ssp_vulkan_pipeline_destroy(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, VkDevice device);
 

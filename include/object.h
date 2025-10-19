@@ -24,10 +24,8 @@ struct SSPObject {
 
     struct SSPShaderPushConstant vertex_push_constant;
 
-    VkBuffer vertex_buffer;
-    VkDeviceMemory vertex_memory;
-    VkBuffer index_buffer;
-    VkDeviceMemory index_memory;
+    struct SSPVulkanBuffer vertex_buffer;
+    struct SSPVulkanBuffer index_buffer;
 
     enum SSP_OBJECT_STATUS status;
 };

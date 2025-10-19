@@ -30,9 +30,7 @@ namespace Sisyphus {
     
     void Engine::updateCamera(Camera &camera)
     {
-        SSPCamera *data = camera.data();
-
-        _renderer.dataVulkanContext()->cameraData = data;
+        _renderer.dataVulkanContext()->cameraData = camera.data();
 
         ssp_vulkan_update_proj(camera.data(), &_renderer.dataVulkanContext()->pipeline_context, _renderer.dataVulkanContext()->swapchain.extent);
         ssp_vulkan_update_view(camera.data(), &_renderer.dataVulkanContext()->pipeline_context);

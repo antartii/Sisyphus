@@ -16,6 +16,20 @@ struct SSPDynamicArray *ssp_dynamic_array_init(size_t pools_size, size_t elem_si
     return array;
 }
 
+bool ssp_dynamic_array_replace(struct SSPDynamicArray *array, size_t src_index, size_t dst_index)
+{
+    if (src_index >= array->size || dst_index >= array->size)
+        return false;
+
+    if (array->storing_ptr)
+        ((void **) array->data)[dst_index] = ((void **) array->data)[src_index];
+    else
+        memcpy((char *) array->data + dst_index * array->elem_size, (char *) array->data + src_index * array->elem_size, array->elem_size);
+    
+    --array->size;
+    return true;
+}
+
 void ssp_dynamic_array_push(struct SSPDynamicArray *array, void *data)
 {
     if (array->size == array->capacity) {

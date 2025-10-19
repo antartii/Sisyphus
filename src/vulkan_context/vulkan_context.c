@@ -29,8 +29,9 @@ enum SSP_ERROR_CODE ssp_vulkan_draw_frame(struct SSPVulkanContext *pContext, str
     struct SSPVulkanCommandContext *command_context = &pContext->command_context;
     struct SSPVulkanPipelineContext *pipeline_context = &pContext->pipeline_context;
     bool resize_after_present = false;
-    
+
     ssp_vulkan_copy_buffer_round(ext_func, &pContext->command_context, device);
+    ssp_vulkan_copy_image_buffer_queue_round(ext_func, &pContext->command_context, &pContext->device);
 
     ext_func->vkWaitForFences(device->logical_device, 1, &(command_context->frames_in_flight_fences[pipeline_context->current_frame]), VK_TRUE, UINT64_MAX);
 

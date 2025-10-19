@@ -360,45 +360,6 @@ void ssp_vulkan_update_proj(struct SSPCamera *camera, struct SSPVulkanPipelineCo
         memcpy(PTR_OFFSET(pipeline_context->uniform_buffers_mapped[i], sizeof(mat4)), &proj, sizeof(mat4));
 }
 
-enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
-    struct SSPVulkanContextExtFunc *ext_func,
-    VkImage *image,
-    VkImageLayout old_layout,
-    VkImageLayout new_layout,
-    VkAccessFlags2 src_access_mask,
-    VkAccessFlags2 dst_access_mask,
-    VkPipelineStageFlags2 src_stage_mask,
-    VkPipelineStageFlags2 dst_stage_mask,
-    VkCommandBuffer command_buffer,
-    uint32_t src_queue_family_index,
-    uint32_t dst_queue_family_index)
-{
-    VkImageMemoryBarrier2 barrier = {0};
-    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-    barrier.srcAccessMask = src_access_mask;
-    barrier.dstAccessMask = dst_access_mask;
-    barrier.srcStageMask = src_stage_mask;
-    barrier.dstStageMask = dst_stage_mask;
-    barrier.oldLayout = old_layout;
-    barrier.newLayout = new_layout;
-    barrier.srcQueueFamilyIndex = src_queue_family_index;
-    barrier.dstQueueFamilyIndex = dst_queue_family_index;
-    barrier.image = *image;
-    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    barrier.subresourceRange.baseMipLevel = 0;
-    barrier.subresourceRange.levelCount = 1;
-    barrier.subresourceRange.baseArrayLayer = 0;
-    barrier.subresourceRange.layerCount = 1;
-
-    VkDependencyInfo dependency_info = {0};
-    dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
-    dependency_info.imageMemoryBarrierCount = 1;
-    dependency_info.pImageMemoryBarriers = &barrier;
-
-    ext_func->vkCmdPipelineBarrier2KHR(command_buffer, &dependency_info);
-    return SSP_ERROR_CODE_SUCCESS;
-}
-
 enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanContextExtFunc *ext_func,
     struct SSPVulkanSwapchain *swapchain,
     struct SSPVulkanCommandContext *command_context,
@@ -411,7 +372,7 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     ext_func->vkBeginCommandBuffer(command_context->graphic_command_buffers[current_frame], &begin_info);
-    ssp_vulkan_transition_image_layout(ext_func, &(swapchain->images[pipeline_context->image_index]), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 0, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, command_context->graphic_command_buffers[current_frame], VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED);
+    ssp_vulkan_transition_image_layout(ext_func, swapchain->images[pipeline_context->image_index], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 0, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, command_context->graphic_command_buffers[current_frame], VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED);
 
     VkClearValue clear_color = {.color.float32 = {0.0, 0.0, 0.0, 1.0}}; // todo : define it at init
 
@@ -450,16 +411,23 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
 
         if (!object)
             continue;
+        if (object->status != SSP_OBJECT_READY) {
+            if (object->index_buffer.state == SSP_VULKAN_BUFFER_STATE_READY
+                &&  object->vertex_buffer.state == SSP_VULKAN_BUFFER_STATE_READY)
+                object->status = SSP_OBJECT_READY;
+            else
+                continue;
+        }
 
-        ext_func->vkCmdBindVertexBuffers(command_context->graphic_command_buffers[current_frame], 0, 1, &object->vertex_buffer, &offset);
-        ext_func->vkCmdBindIndexBuffer(command_context->graphic_command_buffers[current_frame], object->index_buffer, offset, VK_INDEX_TYPE_UINT16);
+        ext_func->vkCmdBindVertexBuffers(command_context->graphic_command_buffers[current_frame], 0, 1, &object->vertex_buffer.buffer, &offset);
+        ext_func->vkCmdBindIndexBuffer(command_context->graphic_command_buffers[current_frame], object->index_buffer.buffer, offset, VK_INDEX_TYPE_UINT16);
         ext_func->vkCmdPushConstants(command_context->graphic_command_buffers[current_frame], pipeline_context->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(struct SSPShaderPushConstant), &object->vertex_push_constant);
         ext_func->vkCmdDrawIndexed(command_context->graphic_command_buffers[current_frame], object->indices_count, 1, 0, 0, 0);
     }
     objects_to_draw->size = 0;
 
     ext_func->vkCmdEndRenderingKHR(command_context->graphic_command_buffers[current_frame]);
-    ssp_vulkan_transition_image_layout(ext_func, &(swapchain->images[pipeline_context->image_index]), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT, 0, VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT, command_context->graphic_command_buffers[current_frame], VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED);
+    ssp_vulkan_transition_image_layout(ext_func, swapchain->images[pipeline_context->image_index], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT, 0, VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT, command_context->graphic_command_buffers[current_frame], VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED);
     ext_func->vkEndCommandBuffer(command_context->graphic_command_buffers[current_frame]);
 
     return SSP_ERROR_CODE_SUCCESS;

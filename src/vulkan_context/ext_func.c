@@ -107,6 +107,7 @@ enum SSP_ERROR_CODE ssp_vulkan_ext_func_device(struct SSPVulkanContextExtFunc *e
     ext_func->vkCmdCopyBufferToImage = (PFN_vkCmdCopyBufferToImage) vkGetDeviceProcAddr(logical_device, "vkCmdCopyBufferToImage");
 
     ext_func->vkCmdPipelineBarrier = (PFN_vkCmdPipelineBarrier) vkGetDeviceProcAddr(logical_device, "vkCmdPipelineBarrier");
+    ext_func->vkGetSemaphoreCounterValueKHR = (PFN_vkGetSemaphoreCounterValueKHR) vkGetDeviceProcAddr(logical_device, "vkGetSemaphoreCounterValueKHR");
 
     return SSP_ERROR_CODE_SUCCESS;
 }

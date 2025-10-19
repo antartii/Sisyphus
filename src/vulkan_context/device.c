@@ -8,6 +8,7 @@ static const char *ssp_vulkan_device_extensions_name[] = {
     VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
     VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+    VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME
 };
 
 static const size_t ssp_vulkan_device_extensions_name_size = ARRAY_SIZE(ssp_vulkan_device_extensions_name);
@@ -54,22 +55,25 @@ enum SSP_ERROR_CODE ssp_vulkan_create_logical_device(struct SSPVulkanContextExtF
     dynamic_rendering_features.dynamicRendering = VK_TRUE;
     dynamic_rendering_features.pNext = &sync_2_features;
 
+    VkPhysicalDeviceTimelineSemaphoreFeaturesKHR timeline_semaphores_features = {0};
+    timeline_semaphores_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR;
+    timeline_semaphores_features.timelineSemaphore = VK_TRUE;
+    timeline_semaphores_features.pNext = &dynamic_rendering_features;
+
     VkDeviceCreateInfo create_info = {0};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.queueCreateInfoCount = queue_count;
     create_info.pQueueCreateInfos = queue_create_info;
     create_info.enabledExtensionCount = ssp_vulkan_device_extensions_name_size;
     create_info.ppEnabledExtensionNames = ssp_vulkan_device_extensions_name;
-    create_info.pNext = &dynamic_rendering_features;
+    create_info.pNext = &timeline_semaphores_features;
 
     if (ext_func->vkCreateDevice(device->physical_device, &create_info, NULL, &device->logical_device) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_LOGICAL_DEVICE_CREATION;
-    
     if ((error_code = ssp_vulkan_ext_func_device(ext_func, device->logical_device)))
         return error_code;
 
     free(queue_create_info);
-
     ext_func->vkGetDeviceQueue(device->logical_device, device->queue_family_indices.graphic, 0, &device->graphic_queue);
     if (device->queue_family_indices.graphic != device->queue_family_indices.present)
         ext_func->vkGetDeviceQueue(device->logical_device, device->queue_family_indices.present, 0, &device->present_queue);

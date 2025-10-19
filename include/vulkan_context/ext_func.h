@@ -112,6 +112,8 @@ struct SSPVulkanContextExtFunc {
     PFN_vkCreateWaylandSurfaceKHR vkCreateWaylandSurfaceKHR;
     #endif
     PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR;
+
+    PFN_vkGetSemaphoreCounterValueKHR vkGetSemaphoreCounterValueKHR;
 };
 
 enum SSP_ERROR_CODE ssp_vulkan_ext_func_instance_global(struct SSPVulkanContextExtFunc *ext_func);

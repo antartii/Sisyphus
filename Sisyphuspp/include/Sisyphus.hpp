@@ -3,5 +3,6 @@
 
 #include "engine.hpp"
 #include "utils.hpp"
+#include "texture.hpp"
 
 #endif

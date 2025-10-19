@@ -37,6 +37,7 @@ add_library(${PROJECT_NAME} ${CXX_LIB_TYPE}
     ${PROJECT_SOURCE_DIR}/src/window.cpp
     ${PROJECT_SOURCE_DIR}/src/camera.cpp
     ${PROJECT_SOURCE_DIR}/src/object.cpp
+    ${PROJECT_SOURCE_DIR}/src/texture.cpp
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

@@ -3,7 +3,7 @@
 struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count)
 {
     struct SSPObject *object = calloc(1, sizeof(struct SSPObject));
-    struct SSPShaderVertex *vertices = malloc(sizeof(struct SSPShaderVertex) * vertices_count);
+    struct SSPShaderVertex *vertices = calloc(vertices_count, sizeof(struct SSPShaderVertex));
 
     object->indices_count = (vertices_count - 2) * 3;
     glm_mat4_identity(object->vertex_push_constant.model);
@@ -18,8 +18,8 @@ struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos
     struct SSPVulkanContext *context = &engine->renderer->vulkan_context;
     struct SSPVulkanContextExtFunc *ext_func = &context->ext_func;
 
-    if (ssp_vulkan_create_vertex_buffer(ext_func, &context->device, &context->command_context, &object->vertex_buffer, &object->vertex_memory, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
-        || !ssp_vulkan_create_index_buffer(ext_func, &context->device, &context->command_context, &object->index_buffer, &object->index_memory, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
+    if (ssp_vulkan_create_vertex_buffer(ext_func, &context->device, &context->command_context, &object->vertex_buffer, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
+        || !ssp_vulkan_create_index_buffer(ext_func, &context->device, &context->command_context, &object->index_buffer, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
         free(vertices);
         free(object);
         return NULL;
@@ -34,12 +34,14 @@ void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object)
     struct SSPVulkanContext *context = &engine->renderer->vulkan_context;
     struct SSPVulkanContextExtFunc *ext_func = &context->ext_func;
     VkDevice logical_device = context->device.logical_device;
+    struct SSPVulkanBuffer *vertex_buffer = &object->vertex_buffer;
+    struct SSPVulkanBuffer *index_buffer = &object->index_buffer;
 
-    ext_func->vkDestroyBuffer(logical_device, object->vertex_buffer, NULL);
-    ext_func->vkFreeMemory(logical_device, object->vertex_memory, NULL);
+    ext_func->vkDestroyBuffer(logical_device, vertex_buffer->buffer, NULL);
+    ext_func->vkFreeMemory(logical_device, vertex_buffer->memory, NULL);
 
-    ext_func->vkDestroyBuffer(logical_device, object->index_buffer, NULL);
-    ext_func->vkFreeMemory(logical_device, object->index_memory, NULL);
+    ext_func->vkDestroyBuffer(logical_device, index_buffer->buffer, NULL);
+    ext_func->vkFreeMemory(logical_device, index_buffer->memory, NULL);
 
     free(object);
 }

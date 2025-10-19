@@ -34,6 +34,7 @@ struct SSPDynamicArray *ssp_dynamic_array_init(size_t pools_size, size_t elem_si
 void ssp_dynamic_array_free(struct SSPDynamicArray *array);
 void ssp_dynamic_array_push(struct SSPDynamicArray *array, void *data);
 void *ssp_dynamic_array_get(struct SSPDynamicArray *array, size_t index);
+bool ssp_dynamic_array_replace(struct SSPDynamicArray *array, size_t src_index, size_t dst_index);
 
 #define SSP_VERSION_DEFAULT (struct SSPVersion) {0, 1, 0};
 

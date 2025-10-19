@@ -2,6 +2,8 @@
 
 enum SSP_ERROR_CODE ssp_vulkan_create_sync_objects(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device)
 {
+    VkDevice logical_device = device->logical_device;
+
     command_context->present_complete_semaphores = calloc(SSP_MAX_FRAMES_IN_FLIGHT, sizeof(VkSemaphore));
     command_context->render_finished_semaphores = calloc(SSP_MAX_FRAMES_IN_FLIGHT, sizeof(VkSemaphore));
     command_context->frames_in_flight_fences = calloc(SSP_MAX_FRAMES_IN_FLIGHT, sizeof(VkFence));
@@ -14,16 +16,24 @@ enum SSP_ERROR_CODE ssp_vulkan_create_sync_objects(struct SSPVulkanContextExtFun
     fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for (int i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i) {
-        if (ext_func->vkCreateSemaphore(device->logical_device, &semaphore_create_info, NULL, &(command_context->present_complete_semaphores[i])))
+        if (ext_func->vkCreateSemaphore(logical_device, &semaphore_create_info, NULL, &(command_context->present_complete_semaphores[i])))
             return SSP_ERROR_CODE_VULKAN_CREATE_PRESENT_COMPLETE_SEMAPHORES;
-        if (ext_func->vkCreateSemaphore(device->logical_device, &semaphore_create_info, NULL, &(command_context->render_finished_semaphores[i])))
+        if (ext_func->vkCreateSemaphore(logical_device, &semaphore_create_info, NULL, &(command_context->render_finished_semaphores[i])))
             return SSP_ERROR_CODE_VULKAN_CREATE_RENDER_FINISHED_SEMAPHORES;
-        if (ext_func->vkCreateFence(device->logical_device, &fence_create_info, NULL, &(command_context->frames_in_flight_fences[i])) != VK_SUCCESS)
+        if (ext_func->vkCreateFence(logical_device, &fence_create_info, NULL, &(command_context->frames_in_flight_fences[i])) != VK_SUCCESS)
             return SSP_ERROR_CODE_VULKAN_CREATE_FRAMES_IN_FLIGHT_FENCES;
     }
 
-    if (ext_func->vkCreateFence(device->logical_device, &fence_create_info, NULL, &command_context->transfer_copy_buffer_fence) != VK_SUCCESS
-        || ext_func->vkCreateFence(device->logical_device, &fence_create_info, NULL, &command_context->transfer_copy_buffer_to_image_fence) != VK_SUCCESS)
+    VkSemaphoreTypeCreateInfoKHR semaphore_type_create_info = {0};
+    semaphore_type_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO_KHR;
+    semaphore_type_create_info.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE_KHR;
+    semaphore_type_create_info.initialValue = 0;
+
+    semaphore_create_info.pNext = &semaphore_type_create_info;
+
+    if (ext_func->vkCreateSemaphore(logical_device, &semaphore_create_info, NULL, &command_context->transfer_semaphore_timeline) != VK_SUCCESS
+        || ext_func->vkCreateSemaphore(logical_device, &semaphore_create_info, NULL, &command_context->transfer_image_semaphore_timeline) != VK_SUCCESS)
+        return SSP_ERROR_CODE_VULKAN_CREATE_TRANSFER_COPY_BUFFER_SEMAPHORE;
 
     return SSP_ERROR_CODE_SUCCESS;
 }
@@ -49,6 +59,7 @@ enum SSP_ERROR_CODE ssp_vulkan_sync_objects_destroy(struct SSPVulkanContextExtFu
             ext_func->vkDestroySemaphore(logical_device, command_context->render_finished_semaphores[i], NULL);
         free(command_context->render_finished_semaphores);
     }
-    ext_func->vkDestroyFence(logical_device, command_context->transfer_copy_buffer_fence, NULL);
-    ext_func->vkDestroyFence(logical_device, command_context->transfer_copy_buffer_to_image_fence, NULL);
+
+    ext_func->vkDestroySemaphore(logical_device, command_context->transfer_semaphore_timeline, NULL);
+    ext_func->vkDestroySemaphore(logical_device, command_context->transfer_image_semaphore_timeline, NULL);
 }
