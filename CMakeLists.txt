@@ -127,6 +127,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 find_package(Vulkan REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Vulkan::Vulkan
+    m
     ${SURFACE_LIBRARIES}
 )
 

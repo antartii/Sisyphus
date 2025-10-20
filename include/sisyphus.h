@@ -5,6 +5,7 @@
     #include "engine.h"
     #include "config.h"
     #include "object.h"
+    #include "texture.h"
 
     #include <stdio.h>
 

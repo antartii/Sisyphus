@@ -17,6 +17,7 @@ ConstantBuffer<UniformBuffer> ubo;
 
 struct PushConstants {
     float4x4 model;
+    int isTextured;
 };
 
 [[vk::push_constant]]
@@ -33,5 +34,8 @@ VertexOutput vertMain(VertexInput input) {
 [shader ("fragment")]
 float4 fragMain (VertexOutput inVert) : SV_Target
 {
-    return float4(inVert.color, 1.0);
+    if (push.isTextured == 0)
+        return float4(inVert.color, 1.0);
+    else
+        return float4(1.0, 1.0, 0.0, 1.0);
 }

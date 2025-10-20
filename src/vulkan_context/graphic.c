@@ -79,7 +79,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_pool(struct SSPVulkanContextExt
     descriptor_info.maxSets = SSP_MAX_FRAMES_IN_FLIGHT;
     descriptor_info.poolSizeCount = 1;
     descriptor_info.pPoolSizes = &size;
-    
+
     if (ext_func->vkCreateDescriptorPool(device->logical_device, &descriptor_info, NULL, &pipeline_context->descriptor_pool) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_CREATE_DESCRIPTOR_POOL;
     return SSP_ERROR_CODE_SUCCESS;
@@ -258,7 +258,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_graphic_pipeline(struct SSPVulkanContextEx
     color_blend_info.pAttachments = &color_blend_attachment;
 
     VkPushConstantRange push_constant_range = {0};
-    push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     push_constant_range.size = sizeof(struct SSPShaderPushConstant);
 
     VkPipelineLayoutCreateInfo pipeline_layout_info = {0};
@@ -433,7 +433,7 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
 
         ext_func->vkCmdBindVertexBuffers(command_context->graphic_command_buffers[current_frame], 0, 1, &object->vertex_buffer.buffer, &offset);
         ext_func->vkCmdBindIndexBuffer(command_context->graphic_command_buffers[current_frame], object->index_buffer.buffer, offset, VK_INDEX_TYPE_UINT16);
-        ext_func->vkCmdPushConstants(command_context->graphic_command_buffers[current_frame], pipeline_context->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(struct SSPShaderPushConstant), &object->vertex_push_constant);
+        ext_func->vkCmdPushConstants(command_context->graphic_command_buffers[current_frame], pipeline_context->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(struct SSPShaderPushConstant), &object->vertex_push_constant);
         ext_func->vkCmdDrawIndexed(command_context->graphic_command_buffers[current_frame], object->indices_count, 1, 0, 0, 0);
     }
     objects_to_draw->size = 0;
