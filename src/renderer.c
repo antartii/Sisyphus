@@ -23,4 +23,5 @@ enum SSP_ERROR_CODE ssp_renderer_create(struct SSPRenderer *pRenderer, struct SS
     ssp_vulkan_context_init(&pRenderer->vulkan_context, window, app_name, app_version);
 
     pRenderer->objects_to_draw = ssp_dynamic_array_init(SSP_DEFAULT_OBJECTS_POOLS_SIZE, sizeof(struct SSPObject *), true);
+    return SSP_ERROR_CODE_SUCCESS;
 }

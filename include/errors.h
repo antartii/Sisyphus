@@ -44,6 +44,7 @@ enum SSP_ERROR_SEVERITY {
     X(SSP_ERROR_CODE_VULKAN_CREATE_FENCES, "Vulkan context coldn't create the fences", SSP_ERROR_SEVERITY_CRITICAL)    \
     X(SSP_ERROR_CODE_VULKAN_CREATE_TRANSFER_COPY_BUFFER_SEMAPHORE, "Vulkan context couldn't create the semaphore timeline for transfer copy buffer", SSP_ERROR_SEVERITY_CRITICAL)  \
     X(SSP_ERROR_CODE_SKIP_COPY, "Skipping copy buffer for this round", SSP_ERROR_SEVERITY_INFO) \
+    X(SSP_ERROR_CODE_CREATE_OBJECT, "Couldn't create the object", SSP_ERROR_SEVERITY_WARNING)   \
     \
     X(SSP_ERROR_CODE_IMAGE_LOAD, "Failed to load the texture image", SSP_ERROR_SEVERITY_WARNING)
 

@@ -7,6 +7,7 @@
 #include "surfaces/surfaces.h"
 #include "camera.h"
 #include "vulkan_context/vulkan_context.h"
+#include "utils.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -32,9 +33,10 @@ struct SSPEngine {
     bool external_camera;
 };
 
-struct SSPEngine *ssp_engine_create(struct SSPConfig *config, enum SSP_ERROR_CODE *error_code);
+enum SSP_ERROR_CODE ssp_engine_create(struct SSPConfig *config, struct SSPEngine *pEngine);
 void ssp_engine_destroy(struct SSPEngine *pEngine);
 bool ssp_engine_run(struct SSPEngine *pEngine);
+void ssp_engine_error(struct SSPEngine *pEngine, enum SSP_ERROR_CODE err_code);
 
 struct SSPObject;
 void ssp_engine_draw(struct SSPEngine *pEngine, struct SSPObject *object);

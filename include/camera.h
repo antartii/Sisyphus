@@ -4,6 +4,8 @@
 #include <vulkan/vulkan.h>
 #include <cglm/cglm.h>
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,10 +25,9 @@ struct SSPCamera {
     float fov_in_radians;
 };
 
-struct SSPCamera *ssp_camera_create();
+SSP_API enum SSP_ERROR_CODE ssp_camera_create(struct SSPCamera *camera);
 void ssp_camera_destroy(struct SSPCamera *camera);
 void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera);
-void ssp_camera_init(struct SSPCamera *camera);
 
 #ifdef __cplusplus
     }

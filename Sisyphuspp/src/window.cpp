@@ -3,7 +3,7 @@
 
 namespace Sisyphus {
     Window::Window(Config &config):
-        _window((struct SSPWindow *) calloc(1, sizeof(struct SSPWindow)))
+        _window(std::unique_ptr<SSPWindow>())
     {
         _window->height = SSP_WINDOW_DEFAULT_HEIGHT;
         _window->width = SSP_WINDOW_DEFAULT_WIDTH;

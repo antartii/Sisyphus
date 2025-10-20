@@ -7,6 +7,7 @@ enum SSP_ERROR_CODE ssp_window_create(struct SSPWindow *pWindow, struct SSPConfi
     #ifdef VK_USE_PLATFORM_WAYLAND_KHR
     result = ssp_wayland_surface_init(pWindow, &pWindow->surface_context, config);
     #endif
+
     return result;
 }
 

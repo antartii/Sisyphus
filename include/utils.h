@@ -36,6 +36,8 @@ void ssp_dynamic_array_push(struct SSPDynamicArray *array, void *data);
 void *ssp_dynamic_array_get(struct SSPDynamicArray *array, size_t index);
 bool ssp_dynamic_array_replace(struct SSPDynamicArray *array, size_t src_index, size_t dst_index);
 
+bool debuglog(const char *str);
+
 #define SSP_VERSION_DEFAULT (struct SSPVersion) {0, 1, 0};
 
 int clamp_int(int val, int min, int max);

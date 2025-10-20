@@ -1,8 +1,7 @@
 #include "object.h"
 
-struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count)
+enum SSP_ERROR_CODE spp_object_create(struct SSPObject *object, struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count)
 {
-    struct SSPObject *object = calloc(1, sizeof(struct SSPObject));
     struct SSPShaderVertex *vertices = calloc(vertices_count, sizeof(struct SSPShaderVertex));
 
     object->indices_count = (vertices_count - 2) * 3;
@@ -19,14 +18,13 @@ struct SSPObject *spp_object_create(struct SSPEngine *engine, vec2 *vertices_pos
     struct SSPVulkanContextExtFunc *ext_func = &context->ext_func;
 
     if (ssp_vulkan_create_vertex_buffer(ext_func, &context->device, &context->command_context, &object->vertex_buffer, vertices, vertices_count) != SSP_ERROR_CODE_SUCCESS
-        || !ssp_vulkan_create_index_buffer(ext_func, &context->device, &context->command_context, &object->index_buffer, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
+        || ssp_vulkan_create_index_buffer(ext_func, &context->device, &context->command_context, &object->index_buffer, indices, object->indices_count) != SSP_ERROR_CODE_SUCCESS) {
         free(vertices);
-        free(object);
-        return NULL;
+        return SSP_ERROR_CODE_CREATE_OBJECT;
     }
     free(vertices);
 
-    return object;
+    return SSP_ERROR_CODE_SUCCESS;
 }
 
 void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object)
@@ -42,11 +40,9 @@ void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object)
 
     ext_func->vkDestroyBuffer(logical_device, index_buffer->buffer, NULL);
     ext_func->vkFreeMemory(logical_device, index_buffer->memory, NULL);
-
-    free(object);
 }
 
-struct SSPObject *ssp_object_create_rectangle(struct SSPEngine *engine, vec2 pos, vec2 size, vec3 color)
+enum SSP_ERROR_CODE ssp_object_create_rectangle(struct SSPObject *object, struct SSPEngine *engine, vec2 pos, vec2 size, vec3 color)
 {
     uint16_t indices[] = {
         0, 1, 2, 2, 3, 0
@@ -62,5 +58,5 @@ struct SSPObject *ssp_object_create_rectangle(struct SSPEngine *engine, vec2 pos
         {pos[0], opposite_vertice[1]}
     };
 
-    return spp_object_create(engine, vertices, color, indices, 4);
+    return spp_object_create(object, engine, vertices, color, indices, 4);
 }
