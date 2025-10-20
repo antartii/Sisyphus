@@ -8,7 +8,8 @@ static const char *ssp_vulkan_device_extensions_name[] = {
     VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
     VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-    VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME
+    VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+    VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
 };
 
 static const size_t ssp_vulkan_device_extensions_name_size = ARRAY_SIZE(ssp_vulkan_device_extensions_name);
@@ -63,6 +64,13 @@ enum SSP_ERROR_CODE ssp_vulkan_create_logical_device(struct SSPVulkanContextExtF
     timeline_semaphores_features.timelineSemaphore = VK_TRUE;
     timeline_semaphores_features.pNext = &dynamic_rendering_features;
 
+    VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptor_indexing_features = {0};
+    descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
+    descriptor_indexing_features.pNext = &timeline_semaphores_features;
+    descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+    descriptor_indexing_features.runtimeDescriptorArray = VK_TRUE;
+    descriptor_indexing_features.descriptorBindingVariableDescriptorCount = VK_TRUE;
+
     VkDeviceCreateInfo create_info = {0};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.queueCreateInfoCount = queue_count;
@@ -70,7 +78,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_logical_device(struct SSPVulkanContextExtF
     create_info.enabledExtensionCount = ssp_vulkan_device_extensions_name_size;
     create_info.ppEnabledExtensionNames = ssp_vulkan_device_extensions_name;
     create_info.pEnabledFeatures = &physical_device_features;
-    create_info.pNext = &timeline_semaphores_features;
+    create_info.pNext = &descriptor_indexing_features;
 
     if (ext_func->vkCreateDevice(device->physical_device, &create_info, NULL, &device->logical_device) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_LOGICAL_DEVICE_CREATION;
