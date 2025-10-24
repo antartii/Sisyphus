@@ -21,6 +21,7 @@ struct SSPShaderPushConstant {
 struct SSPShaderVertex {
     vec2 pos;
     vec3 color;
+    vec2 texture_coordinate;
 };
 
 #ifdef __cplusplus

@@ -40,36 +40,6 @@ void ssp_vulkan_stage_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SS
     ext_func->vkUnmapMemory(device->logical_device, *staging_buffer_memory);
 }
 
-enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, struct SSPVulkanBuffer *buffer, struct SSPShaderVertex *vertices, uint32_t vertices_count)
-{
-    VkDeviceSize size = sizeof(struct SSPShaderVertex) * vertices_count;
-
-    VkBuffer staging_buffer;
-    VkDeviceMemory staging_memory;
-
-    buffer->state = SSP_VULKAN_BUFFER_STATE_NOT_INITIALIZED;
-
-    ssp_vulkan_stage_buffer(ext_func, device, size, vertices, &staging_buffer, &staging_memory);
-
-    ssp_vulkan_create_buffer(ext_func, device, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &buffer->buffer, &buffer->memory);
-    ssp_vulkan_copy_buffer_queue_push(command_context->transfer_copy_buffer_queue, buffer, staging_buffer, staging_memory, size, SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER | SSP_VULKAN_COPY_BUFFER_FREE_SRC_MEMORY);
-
-    return SSP_ERROR_CODE_SUCCESS;
-}
-
-enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, struct SSPVulkanBuffer *buffer, uint16_t *indices, uint32_t indices_count)
-{
-    VkDeviceSize size = sizeof(uint16_t) * indices_count;
-    VkBuffer staging_buffer;
-    VkDeviceMemory staging_memory;
-
-    ssp_vulkan_stage_buffer(ext_func, device, size, indices, &staging_buffer, &staging_memory);
-    ssp_vulkan_create_buffer(ext_func, device, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &buffer->buffer, &buffer->memory);
-    ssp_vulkan_copy_buffer_queue_push(command_context->transfer_copy_buffer_queue, buffer, staging_buffer, staging_memory, size, SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER | SSP_VULKAN_COPY_BUFFER_FREE_SRC_MEMORY);
-
-    return SSP_ERROR_CODE_SUCCESS;
-}
-
 static enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_post_processes(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context)
 {
     struct SSPDynamicArray *array = command_context->transfer_copy_buffer_to_image_queue;
@@ -92,15 +62,17 @@ static enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_post_processes(str
 
         data->image->texture_index = pipeline_context->texture_count++;
 
-        VkWriteDescriptorSet write = {0};
-        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        write.dstSet = pipeline_context->descriptor_sets[0];
-        write.dstBinding = 1;
-        write.dstArrayElement = data->image->texture_index;
-        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write.descriptorCount = 1;
-        write.pImageInfo = &image_info;
-        ext_func->vkUpdateDescriptorSets(device->logical_device, 1, &write, 0, NULL);
+        for (size_t i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i) {
+            VkWriteDescriptorSet write = {0};
+            write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            write.dstSet = pipeline_context->descriptor_sets[i];
+            write.dstBinding = 1;
+            write.dstArrayElement = data->image->texture_index;
+            write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            write.descriptorCount = 1;
+            write.pImageInfo = &image_info;
+            ext_func->vkUpdateDescriptorSets(device->logical_device, 1, &write, 0, NULL);
+        }
 
         if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER)
             ext_func->vkDestroyBuffer(device->logical_device, data->src_buffer, NULL);
@@ -233,6 +205,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_queue_push(struct SSPDynamicArray *tr
     data.src_memory = src_memory;
 
     ssp_dynamic_array_push(transfer_copy_buffer_queue, &data);
+    return SSP_ERROR_CODE_SUCCESS;
 }
 
 static void ssp_vulkan_copy_buffer_post_processes(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device)

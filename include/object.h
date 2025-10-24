@@ -21,6 +21,8 @@ enum SSP_OBJECT_STATUS {
 
 struct SSPObject {
     uint32_t indices_count;
+    uint32_t vertices_count;
+    struct SSPShaderVertex *vertices;
 
     struct SSPShaderPushConstant push_constant;
 
@@ -33,6 +35,7 @@ struct SSPObject {
     struct SSPTexture *texture;
 };
 
+enum SSP_ERROR_CODE ssp_object_update_texture_coordinates(struct SSPObject *object, struct SSPEngine *engine, vec2 *texture_coordinates);
 enum SSP_ERROR_CODE spp_object_create(struct SSPObject *object, struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count);
 void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object);
 enum SSP_ERROR_CODE ssp_object_apply_texture(struct SSPObject *object, struct SSPTexture *texture);

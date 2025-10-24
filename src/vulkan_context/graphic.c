@@ -228,7 +228,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_graphic_pipeline(struct SSPVulkanContextEx
     vertex_binding_descriptions.stride = sizeof(struct SSPShaderVertex);
     vertex_binding_descriptions.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    VkVertexInputAttributeDescription vertex_attribute_descriptions[2];
+    VkVertexInputAttributeDescription vertex_attribute_descriptions[3];
     vertex_attribute_descriptions[0].location = 0;
     vertex_attribute_descriptions[0].binding = 0;
     vertex_attribute_descriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
@@ -239,11 +239,16 @@ enum SSP_ERROR_CODE ssp_vulkan_create_graphic_pipeline(struct SSPVulkanContextEx
     vertex_attribute_descriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
     vertex_attribute_descriptions[1].offset = offsetof(struct SSPShaderVertex, color);
 
+    vertex_attribute_descriptions[2].location = 2;
+    vertex_attribute_descriptions[2].binding = 0;
+    vertex_attribute_descriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    vertex_attribute_descriptions[2].offset = offsetof(struct SSPShaderVertex, texture_coordinate);
+
     VkPipelineVertexInputStateCreateInfo vertex_input_info = {0};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertex_input_info.vertexBindingDescriptionCount = 1;
     vertex_input_info.pVertexBindingDescriptions = &vertex_binding_descriptions;
-    vertex_input_info.vertexAttributeDescriptionCount = 2;
+    vertex_input_info.vertexAttributeDescriptionCount = 3;
     vertex_input_info.pVertexAttributeDescriptions = vertex_attribute_descriptions;
 
     VkPipelineInputAssemblyStateCreateInfo input_assembly_info = {0};

@@ -72,8 +72,6 @@ struct SSPVulkanPipelineContext;
 
 enum SSP_ERROR_CODE ssp_vulkan_create_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkMemoryPropertyFlags memory_properties, VkBuffer *buffer, VkDeviceMemory *memory);
 void ssp_vulkan_stage_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkDeviceSize size, void *data, VkBuffer *staging_buffer, VkDeviceMemory *staging_buffer_memory);
-enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, struct SSPVulkanBuffer *buffer, struct SSPShaderVertex *vertices, uint32_t vertices_count);
-enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, struct SSPVulkanBuffer *buffer, uint16_t *indices, uint32_t indices_count);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_queue_push(struct SSPDynamicArray *transfer_copy_buffer_queue, struct SSPVulkanBuffer *dst_buffer, VkBuffer src_buffer, VkDeviceMemory src_memory, VkDeviceSize size, enum SSP_VULKAN_COPY_BUFFER_POST_PROCESS prost_process_flags);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device);
 enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context);
