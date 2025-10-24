@@ -9,6 +9,12 @@
 extern "C" {
 #endif
 
+enum SSP_TEXTURE_STATUS {
+    SSP_TEXTURE_NOT_INITIALISED = 0,
+    SSP_TEXTURE_UPLOADING,
+    SSP_TEXTURE_READY
+};
+
 struct SSPEngine;
 
 struct SSPTexture {
@@ -16,10 +22,8 @@ struct SSPTexture {
     int height;
     int channels;
 
+    struct SSPVulkanImage image;
     VkDeviceSize image_size;
-
-    VkImage image;
-    VkImageView image_view;
     VkDeviceMemory image_memory;
 };
 

@@ -5,7 +5,7 @@ enum SSP_ERROR_CODE spp_object_create(struct SSPObject *object, struct SSPEngine
     struct SSPShaderVertex *vertices = calloc(vertices_count, sizeof(struct SSPShaderVertex));
 
     object->indices_count = (vertices_count - 2) * 3;
-    glm_mat4_identity(object->vertex_push_constant.model);
+    glm_mat4_identity(object->push_constant.model);
 
     for (uint32_t i = 0; i < vertices_count; ++i) {
         glm_vec3(color, vertices[i].color);
@@ -59,4 +59,12 @@ enum SSP_ERROR_CODE ssp_object_create_rectangle(struct SSPObject *object, struct
     };
 
     return spp_object_create(object, engine, vertices, color, indices, 4);
+}
+
+enum SSP_ERROR_CODE ssp_object_apply_texture(struct SSPObject *object, struct SSPTexture *texture)
+{
+    object->is_textured = true;
+    object->texture = texture;
+
+    return SSP_ERROR_CODE_SUCCESS;
 }

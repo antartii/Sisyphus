@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#define SSP_MAX_TEXTURE_COUNT 1000
+
 struct SSPVulkanPipelineContext {
     VkDescriptorSetLayout descriptor_set_layout;
     VkDescriptorPool descriptor_pool;
@@ -34,6 +36,7 @@ struct SSPVulkanPipelineContext {
 
     int image_index;
     int current_frame;
+    int texture_count;
 };
 
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_set_layout(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context);

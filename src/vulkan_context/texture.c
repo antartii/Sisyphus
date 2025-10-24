@@ -35,12 +35,12 @@ enum SSP_ERROR_CODE spp_texture_create(struct SSPTexture *texture, struct SSPEng
         VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        &texture->image,
+        &texture->image.image,
         &texture->image_memory);
 
     struct SSPVulkanCommandContext *command_context = &pContext->command_context;
     ssp_vulkan_copy_image_buffer_queue_push(command_context->transfer_copy_buffer_to_image_queue,
-        command_context, texture->image, &texture->image_view,
+        command_context, &texture->image,
         texture->height, texture->width,
         0, 0,
         staging_buffer,
@@ -56,7 +56,7 @@ void ssp_texture_destroy(struct SSPEngine *engine, struct SSPTexture *texture)
     VkDevice logical_device = engine->renderer->vulkan_context.device.logical_device;
     struct SSPVulkanContextExtFunc *ext_func = &engine->renderer->vulkan_context.ext_func;
     
-    ext_func->vkDestroyImage(logical_device, texture->image, NULL);
+    ext_func->vkDestroyImage(logical_device, texture->image.image, NULL);
     ext_func->vkFreeMemory(logical_device, texture->image_memory, NULL);
-    ext_func->vkDestroyImageView(logical_device, texture->image_view, NULL);
+    ext_func->vkDestroyImageView(logical_device, texture->image.image_view, NULL);
 }

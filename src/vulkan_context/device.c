@@ -70,6 +70,8 @@ enum SSP_ERROR_CODE ssp_vulkan_create_logical_device(struct SSPVulkanContextExtF
     descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
     descriptor_indexing_features.runtimeDescriptorArray = VK_TRUE;
     descriptor_indexing_features.descriptorBindingVariableDescriptorCount = VK_TRUE;
+    descriptor_indexing_features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+    descriptor_indexing_features.descriptorBindingPartiallyBound = VK_TRUE;
 
     VkDeviceCreateInfo create_info = {0};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

@@ -16,6 +16,7 @@ struct SSPShaderUniformBuffer {
 struct SSPShaderPushConstant {
     alignas(16) mat4 model;
     bool isTextured;
+    int textureIndex;
 };
 
 struct SSPShaderVertex {

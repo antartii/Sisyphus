@@ -70,20 +70,37 @@ enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContextExtFun
     return SSP_ERROR_CODE_SUCCESS;
 }
 
-static enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_post_processes(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device)
+static enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_post_processes(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context)
 {
     struct SSPDynamicArray *array = command_context->transfer_copy_buffer_to_image_queue;
 
     for (size_t i = 0; i < array->size; ++i) {
         struct SSPVulkanCopyBufferToImageData *data = ssp_dynamic_array_get(array, i);
 
-        if (data->image.state < SSP_VULKAN_BUFFER_STATE_LOADING
-            || command_context->curr_transfer_image_semaphore_value < data->image.queue_batch)
+        if (data->image->state < SSP_VULKAN_BUFFER_STATE_LOADING
+            || command_context->curr_transfer_image_semaphore_value < data->image->queue_batch)
             continue;
         
-        data->image.state = SSP_VULKAN_BUFFER_STATE_READY;
+        data->image->state = SSP_VULKAN_BUFFER_STATE_READY;
 
-        ssp_vulkan_create_image_view(ext_func, device, VK_FORMAT_R8G8B8A8_SRGB, data->image.image, data->image.image_view);
+        ssp_vulkan_create_image_view(ext_func, device, VK_FORMAT_R8G8B8A8_SRGB, data->image->image, &data->image->image_view);
+
+        VkDescriptorImageInfo image_info = {0};
+        image_info.sampler = pipeline_context->texture_sampler;
+        image_info.imageView = data->image->image_view;
+        image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        data->image->texture_index = pipeline_context->texture_count++;
+
+        VkWriteDescriptorSet write = {0};
+        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        write.dstSet = pipeline_context->descriptor_sets[0];
+        write.dstBinding = 1;
+        write.dstArrayElement = data->image->texture_index;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write.descriptorCount = 1;
+        write.pImageInfo = &image_info;
+        ext_func->vkUpdateDescriptorSets(device->logical_device, 1, &write, 0, NULL);
 
         if (data->post_process_bitmask & SSP_VULKAN_COPY_BUFFER_DESTROY_SRC_BUFFER)
             ext_func->vkDestroyBuffer(device->logical_device, data->src_buffer, NULL);
@@ -94,7 +111,7 @@ static enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_post_processes(str
     }
 }
 
-enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device)
+enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context)
 {
     struct SSPDynamicArray *array = command_context->transfer_copy_buffer_to_image_queue;
 
@@ -105,7 +122,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanCon
     if (command_context->curr_transfer_image_semaphore_value < command_context->transfer_image_semaphore_value)
         return SSP_ERROR_CODE_SKIP_COPY;
 
-    ssp_vulkan_copy_image_buffer_queue_post_processes(ext_func, command_context, device);
+    ssp_vulkan_copy_image_buffer_queue_post_processes(ext_func, command_context, device, pipeline_context);
 
     VkBufferImageCopy image_copy = {0};
     VkCommandBuffer command_buffer = command_context->transfer_command_buffers[command_context->transfer_command_buffer_image_copy_index];
@@ -118,13 +135,13 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanCon
     for (size_t i = 0; i < array->size; ++i) {
         struct SSPVulkanCopyBufferToImageData *data = ssp_dynamic_array_get(array, i);
 
-        if (data->image.state == SSP_VULKAN_BUFFER_STATE_LOADING)
+        if (data->image->state == SSP_VULKAN_BUFFER_STATE_LOADING)
             continue;
 
-        data->image.state = SSP_VULKAN_BUFFER_STATE_LOADING;
-        data->image.queue_batch = command_context->transfer_image_semaphore_value + 1;
+        data->image->state = SSP_VULKAN_BUFFER_STATE_LOADING;
+        data->image->queue_batch = command_context->transfer_image_semaphore_value + 1;
 
-        ssp_vulkan_transition_image_layout(ext_func, data->image.image,
+        ssp_vulkan_transition_image_layout(ext_func, data->image->image,
             VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             0, VK_ACCESS_TRANSFER_WRITE_BIT,
             VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
@@ -137,9 +154,9 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanCon
         image_copy.imageOffset = (VkOffset3D) {data->offsetX, data->offsetY, 0};
         image_copy.imageExtent = (VkExtent3D) {data->width, data->height, 1};
 
-        vkCmdCopyBufferToImage(command_buffer, data->src_buffer, data->image.image, data->image_layout, 1, &image_copy);
+        vkCmdCopyBufferToImage(command_buffer, data->src_buffer, data->image->image, data->image_layout, 1, &image_copy);
 
-        ssp_vulkan_transition_image_layout(ext_func, data->image.image,
+        ssp_vulkan_transition_image_layout(ext_func, data->image->image,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
             VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
@@ -178,8 +195,7 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanCon
 
 enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArray *transfer_transition_queue,
     struct SSPVulkanCommandContext *command_context,
-    VkImage image,
-    VkImageView *image_view,
+    struct SSPVulkanImage *image,
     uint32_t height,
     uint32_t width,
     int offsetX,
@@ -192,10 +208,9 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArr
     struct SSPVulkanCopyBufferToImageData data = {0};
     data.height = height;
     data.width = width;
-    data.image.image = image;
-    data.image.image_view = image_view;
-    data.image.queue_batch = command_context->transfer_image_semaphore_value + 1;
-    data.image.state = SSP_VULKAN_BUFFER_STATE_NOT_INITIALIZED;
+    data.image = image;
+    data.image->queue_batch = command_context->transfer_image_semaphore_value + 1;
+    data.image->state = SSP_VULKAN_BUFFER_STATE_NOT_INITIALIZED;
     data.image_layout = image_layout;
     data.offsetX = offsetX;
     data.offsetY = offsetY;

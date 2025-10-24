@@ -48,10 +48,11 @@ struct SSPVulkanCopyBufferData {
 
 struct SSPVulkanImage {
     VkImage image;
-    VkImageView *image_view;
+    VkImageView image_view;
 
     enum SSP_VULKAN_BUFFER_STATE state;
     uint64_t queue_batch;
+    int texture_index;
 };
 
 struct SSPVulkanCopyBufferToImageData {
@@ -62,11 +63,13 @@ struct SSPVulkanCopyBufferToImageData {
     VkBuffer src_buffer;
     VkDeviceMemory src_memory;
 
-    struct SSPVulkanImage image;
+    struct SSPVulkanImage *image;
     VkImageLayout image_layout;
 
     int post_process_bitmask;
 };
+
+struct SSPVulkanPipelineContext;
 
 enum SSP_ERROR_CODE ssp_vulkan_create_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkMemoryPropertyFlags memory_properties, VkBuffer *buffer, VkDeviceMemory *memory);
 void ssp_vulkan_stage_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, VkDeviceSize size, void *data, VkBuffer *staging_buffer, VkDeviceMemory *staging_buffer_memory);
@@ -74,7 +77,7 @@ enum SSP_ERROR_CODE ssp_vulkan_create_vertex_buffer(struct SSPVulkanContextExtFu
 enum SSP_ERROR_CODE ssp_vulkan_create_index_buffer(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanCommandContext *command_context, struct SSPVulkanBuffer *buffer, uint16_t *indices, uint32_t indices_count);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_queue_push(struct SSPDynamicArray *transfer_copy_buffer_queue, struct SSPVulkanBuffer *dst_buffer, VkBuffer src_buffer, VkDeviceMemory src_memory, VkDeviceSize size, enum SSP_VULKAN_COPY_BUFFER_POST_PROCESS prost_process_flags);
 enum SSP_ERROR_CODE ssp_vulkan_copy_buffer_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device);
-enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device);
+enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_round(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanCommandContext *command_context, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context);
 
 enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
     struct SSPVulkanContextExtFunc *ext_func,
@@ -91,8 +94,7 @@ enum SSP_ERROR_CODE ssp_vulkan_transition_image_layout(
 
 enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArray *transfer_transition_queue,
     struct SSPVulkanCommandContext *command_context,
-    VkImage image,
-    VkImageView *image_view,
+    struct SSPVulkanImage *image,
     uint32_t height,
     uint32_t width,
     int offsetX,

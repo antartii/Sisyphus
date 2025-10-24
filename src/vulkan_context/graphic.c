@@ -3,18 +3,37 @@
 
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_set_layout(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context)
 {
-    VkDescriptorSetLayoutBinding descriptor_binding = {0};
+    VkDescriptorSetLayoutBinding ubo_binding = {0};
+    ubo_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    ubo_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    ubo_binding.descriptorCount = 1;
+    ubo_binding.pImmutableSamplers = NULL;
+    ubo_binding.binding = 0;
 
-    descriptor_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptor_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    descriptor_binding.descriptorCount = 1;
-    descriptor_binding.pImmutableSamplers = NULL;
-    descriptor_binding.binding = 0;
+    VkDescriptorSetLayoutBinding texture_binding = {0};
+    texture_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    texture_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    texture_binding.descriptorCount = SSP_MAX_TEXTURE_COUNT;
+    texture_binding.pImmutableSamplers = NULL;
+    texture_binding.binding = 1;
+
+    VkDescriptorSetLayoutBinding bindings[] = {ubo_binding, texture_binding};
+
+    VkDescriptorBindingFlags flags[] = {
+        0,
+        VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT | VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT
+    };
+    VkDescriptorSetLayoutBindingFlagsCreateInfo flags_info = {0};
+    flags_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
+    flags_info.bindingCount = 2;
+    flags_info.pBindingFlags = flags;
 
     VkDescriptorSetLayoutCreateInfo descriptor_info = {0};
     descriptor_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptor_info.bindingCount = 1;
-    descriptor_info.pBindings = &descriptor_binding;
+    descriptor_info.bindingCount = 2;
+    descriptor_info.pBindings = bindings;
+    descriptor_info.pNext = &flags_info;
+    descriptor_info.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
 
     if (ext_func->vkCreateDescriptorSetLayout(device->logical_device, &descriptor_info, NULL, &pipeline_context->descriptor_set_layout) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_CREATE_DESCRIPTOR_SET_LAYOUT;
@@ -46,39 +65,57 @@ enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_sets(struct SSPVulkanContextExt
 {
     VkDescriptorSetLayout *layouts = calloc(SSP_MAX_FRAMES_IN_FLIGHT, sizeof(VkDescriptorSetLayout));
     pipeline_context->descriptor_sets = calloc(SSP_MAX_FRAMES_IN_FLIGHT, sizeof(VkDescriptorSet));
+    uint32_t *descriptor_counts = calloc(SSP_MAX_FRAMES_IN_FLIGHT, sizeof(uint32_t));
 
-    for (size_t i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i)
+    for (size_t i = 0; i < SSP_MAX_FRAMES_IN_FLIGHT; ++i) {
         layouts[i] = pipeline_context->descriptor_set_layout;
+        descriptor_counts[i] = SSP_MAX_TEXTURE_COUNT;
+    }
+
+    VkDescriptorSetVariableDescriptorCountAllocateInfo count_info = {0};
+    count_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
+    count_info.descriptorSetCount = SSP_MAX_FRAMES_IN_FLIGHT;
+    count_info.pDescriptorCounts = descriptor_counts;
 
     VkDescriptorSetAllocateInfo descriptor_set_info = {0};
     descriptor_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     descriptor_set_info.descriptorPool = pipeline_context->descriptor_pool;
     descriptor_set_info.descriptorSetCount = SSP_MAX_FRAMES_IN_FLIGHT;
     descriptor_set_info.pSetLayouts = layouts;
+    descriptor_set_info.pNext = &count_info;
 
     if (ext_func->vkAllocateDescriptorSets(device->logical_device, &descriptor_set_info, pipeline_context->descriptor_sets) != VK_SUCCESS) {
         free(layouts);
+        free(descriptor_counts);
         return false;
     }
 
+
     ssp_vulkan_update_descriptor_sets(ext_func, pipeline_context, device);
 
+    free(descriptor_counts);
     free(layouts);
     return SSP_ERROR_CODE_SUCCESS;
 }
 
 enum SSP_ERROR_CODE ssp_vulkan_create_descriptor_pool(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanDevice *device, struct SSPVulkanPipelineContext *pipeline_context)
 {
-    VkDescriptorPoolSize size = {0};
-    size.descriptorCount = SSP_MAX_FRAMES_IN_FLIGHT;
-    size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    VkDescriptorPoolSize ubo_size = {0};
+    ubo_size.descriptorCount = SSP_MAX_FRAMES_IN_FLIGHT;
+    ubo_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+
+    VkDescriptorPoolSize texture_size = {0};
+    texture_size.descriptorCount = SSP_MAX_TEXTURE_COUNT * SSP_MAX_FRAMES_IN_FLIGHT;
+    texture_size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+
+    VkDescriptorPoolSize sizes[] = {ubo_size, texture_size};
 
     VkDescriptorPoolCreateInfo descriptor_info = {0};
     descriptor_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    descriptor_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    descriptor_info.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
     descriptor_info.maxSets = SSP_MAX_FRAMES_IN_FLIGHT;
-    descriptor_info.poolSizeCount = 1;
-    descriptor_info.pPoolSizes = &size;
+    descriptor_info.poolSizeCount = 2;
+    descriptor_info.pPoolSizes = sizes;
 
     if (ext_func->vkCreateDescriptorPool(device->logical_device, &descriptor_info, NULL, &pipeline_context->descriptor_pool) != VK_SUCCESS)
         return SSP_ERROR_CODE_VULKAN_CREATE_DESCRIPTOR_POOL;
@@ -431,9 +468,16 @@ enum SSP_ERROR_CODE ssp_vulkan_record_graphic_command_buffer(struct SSPVulkanCon
                 continue;
         }
 
+        if (object->is_textured
+            && !object->push_constant.isTextured
+            && object->texture->image.state == SSP_TEXTURE_READY) {
+            object->push_constant.isTextured = true;
+            object->push_constant.textureIndex = object->texture->image.texture_index;
+        }
+
         ext_func->vkCmdBindVertexBuffers(command_context->graphic_command_buffers[current_frame], 0, 1, &object->vertex_buffer.buffer, &offset);
         ext_func->vkCmdBindIndexBuffer(command_context->graphic_command_buffers[current_frame], object->index_buffer.buffer, offset, VK_INDEX_TYPE_UINT16);
-        ext_func->vkCmdPushConstants(command_context->graphic_command_buffers[current_frame], pipeline_context->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(struct SSPShaderPushConstant), &object->vertex_push_constant);
+        ext_func->vkCmdPushConstants(command_context->graphic_command_buffers[current_frame], pipeline_context->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(struct SSPShaderPushConstant), &object->push_constant);
         ext_func->vkCmdDrawIndexed(command_context->graphic_command_buffers[current_frame], object->indices_count, 1, 0, 0, 0);
     }
     objects_to_draw->size = 0;
