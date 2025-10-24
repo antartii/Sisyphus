@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_EXT_FUNC_H
-#define _SISYPHUS_VULKAN_CONTEXT_EXT_FUNC_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -126,6 +125,4 @@ enum SSP_ERROR_CODE ssp_vulkan_ext_func_device(struct SSPVulkanContextExtFunc *e
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

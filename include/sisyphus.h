@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_H
-    #define _SISYPHUS_H
+#pragma once
 
     #include "sisyphus_config.h"
     #include "engine.h"
@@ -20,6 +19,4 @@ SSP_API void ssp_library_print_info(void);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

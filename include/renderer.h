@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_RENDERER_H
-#define _SISYPHUS_RENDERER_H
+#pragma once
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,6 +35,4 @@ enum SSP_ERROR_CODE ssp_renderer_stop(struct SSPRenderer *pRenderer);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

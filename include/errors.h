@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_ERRORS_H
-#define _SISYPHUS_ERRORS_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,6 +62,4 @@ enum SSP_ERROR_SEVERITY ssp_get_error_severity(enum SSP_ERROR_CODE code);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

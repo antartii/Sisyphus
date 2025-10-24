@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_H
-#define _SISYPHUS_VULKAN_CONTEXT_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include <cglm/cglm.h>
@@ -53,6 +52,4 @@ enum SSP_ERROR_CODE ssp_vulkan_context_init(struct SSPVulkanContext *pContext, s
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

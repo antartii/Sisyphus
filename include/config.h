@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_CONFIG_H
-#define _SISYPHUS_CONFIG_H
+#pragma once
 
 #include "utils.h"
 
@@ -15,6 +14,4 @@ struct SSPConfig {
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

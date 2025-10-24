@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_OBJECT_H
-#define _SISYPHUS_OBJECT_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -41,6 +40,4 @@ enum SSP_ERROR_CODE ssp_object_create_rectangle(struct SSPObject *object, struct
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

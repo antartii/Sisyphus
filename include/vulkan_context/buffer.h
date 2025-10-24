@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_BUFFER_H
-#define _SISYPHUS_VULKAN_CONTEXT_BUFFER_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include "ext_func.h"
@@ -106,6 +105,4 @@ enum SSP_ERROR_CODE ssp_vulkan_copy_image_buffer_queue_push(struct SSPDynamicArr
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

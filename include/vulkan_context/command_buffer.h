@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_COMMAND_BUFFER
-#define _SISYPHUS_VULKAN_CONTEXT_COMMAND_BUFFER
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include <stdlib.h>
@@ -58,6 +57,4 @@ enum SSP_ERROR_CODE ssp_vulkan_command_buffer_destroy(struct SSPVulkanContextExt
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

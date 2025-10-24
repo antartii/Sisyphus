@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_CAMERA_H
-#define _SISYPHUS_CAMERA_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include <cglm/cglm.h>
@@ -31,6 +30,4 @@ void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

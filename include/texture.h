@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_TEXTURE_H
-#define _SISYPHUS_TEXTURE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include "vulkan_context/device.h"
@@ -32,6 +31,4 @@ void ssp_texture_destroy(struct SSPEngine *engine, struct SSPTexture *texture);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

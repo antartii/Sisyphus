@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_WINDOW_H
-#define _SISYPHUS_WINDOW_H
+#pragma once
 
 #include <stdlib.h>
 #include "errors.h"
@@ -35,6 +34,4 @@ bool ssp_window_run(struct SSPWindow *pWindow);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

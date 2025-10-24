@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_DEBUG_H
-#define _SISYPHUS_VULKAN_CONTEXT_DEBUG_H
+#pragma once
 
 #include "errors.h"
 #include <vulkan/vulkan.h>
@@ -15,6 +14,4 @@ enum SSP_ERROR_CODE ssp_vulkan_setup_debug_messenger(struct SSPVulkanContextExtF
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

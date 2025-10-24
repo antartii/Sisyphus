@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_ENGINE_H
-#define _SISYPHUS_ENGINE_H
+#pragma once
 
 #include "renderer.h"
 #include "window.h"
@@ -43,6 +42,4 @@ void ssp_engine_draw(struct SSPEngine *pEngine, struct SSPObject *object);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

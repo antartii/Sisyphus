@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_SURFACE_H
-#define _SISYPHUS_VULKAN_CONTEXT_SURFACE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -15,6 +14,4 @@ enum SSP_ERROR_CODE ssp_vulkan_create_surface(struct SSPVulkanContextExtFunc *ex
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

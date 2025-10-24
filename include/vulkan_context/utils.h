@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_UTILS_H
-#define _SISYPHUS_VULKAN_CONTEXT_UTILS_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include "ext_func.h"
@@ -12,6 +11,4 @@ int ssp_vulkan_find_memory_type(struct SSPVulkanContextExtFunc *ext_func, VkPhys
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

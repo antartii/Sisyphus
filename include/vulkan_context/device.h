@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_DEVICE_H
-#define _SISYPHUS_VULKAN_CONTEXT_DEVICE_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 #include <stdbool.h>
@@ -45,6 +44,4 @@ enum SSP_ERROR_CODE ssp_vulkan_get_queue_families_indices(struct SSPVulkanContex
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

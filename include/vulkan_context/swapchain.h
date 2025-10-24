@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_SWAPCHAIN_H
-#define _SISYPHUS_VULKAN_CONTEXT_SWAPCHAIN_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -26,6 +25,4 @@ enum SSP_ERROR_CODE ssp_vulkan_swapchain_destroy(struct SSPVulkanContextExtFunc 
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_WAYLAND_H
-#define _SISYPHUS_WAYLAND_H
+#pragma once
 
 #include <xdg/xdg-shell-client-protocol.h>
 #include <linux/input-event-codes.h>
@@ -38,6 +37,4 @@ bool ssp_wayland_surface_run(struct SSPWaylandSurfaceContext *wayland_context);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

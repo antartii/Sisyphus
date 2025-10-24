@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_VULKAN_CONTEXT_SYNC_OBJECT_H
-#define _SISYPHUS_VULKAN_CONTEXT_SYNC_OBJECT_H
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -17,6 +16,4 @@ enum SSP_ERROR_CODE ssp_vulkan_sync_objects_destroy(struct SSPVulkanContextExtFu
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

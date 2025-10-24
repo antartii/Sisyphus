@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_SHADERS_H
-#define _SISYPHUS_SHADERS_H
+#pragma once
 
 #include <stdalign.h>
 #include <cglm/cglm.h>
@@ -26,6 +25,4 @@ struct SSPShaderVertex {
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif

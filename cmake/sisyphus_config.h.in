@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_FILE_CONFIG_H
-    #define _SISYPHUS_FILE_CONFIG_H
+#pragma once
 
     #define SSP_VERSION_MAJOR @Sisyphus_VERSION_MAJOR@ /** < Major version number of the Sisyphus library */
     #define SSP_VERSION_MINOR @Sisyphus_VERSION_MINOR@ /** < Minor version number of the Sisyphus library */
@@ -12,5 +11,3 @@
     #define SSP_SHADERS_PATH "@SHADER_OUTPUT@"
     #define SSP_SHADER_VERTEX_ENTRY_POINT "vertMain"
     #define SSP_SHADER_FRAGMENT_ENTRY_POINT "fragMain"
-
-#endif

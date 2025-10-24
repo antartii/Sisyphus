@@ -1,5 +1,4 @@
-#ifndef _SISYPHUS_UTILS_H
-#define _SISYPHUS_UTILS_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,6 +44,4 @@ char *read_file(const char *file_name, uint32_t *buffer_size);
 
 #ifdef __cplusplus
     }
-#endif
-
 #endif
