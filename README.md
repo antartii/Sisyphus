@@ -51,3 +51,11 @@ Also I'm french, I'm writing my markdowns in english by head, I should have a le
 ## Contact
 - [Bluesky](https://bsky.app/profile/traveler-anta.bsky.social)
 - Email: fireslidefr@gmail.com
+
+## Licenses and legal
+This product includes third-party software components licensed under the following terms :
+- **Vulkan SDK** : Apache 2.0
+- **GLM** : MIT/Happy bunny
+- **stb_image.h** : Public Domain/MIT
+- **Wayland Protocols** : MIT
+All included licenses are available in the `LICENSES/` directory.
