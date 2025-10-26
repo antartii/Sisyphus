@@ -6,6 +6,7 @@
 #include "engine.h"
 #include "vulkan_context/vulkan_context.h"
 #include "texture.h"
+#include "export.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -35,11 +36,11 @@ struct SSPObject {
     struct SSPTexture *texture;
 };
 
-enum SSP_ERROR_CODE ssp_object_update_texture_coordinates(struct SSPObject *object, struct SSPEngine *engine, vec2 *texture_coordinates);
-enum SSP_ERROR_CODE spp_object_create(struct SSPObject *object, struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count);
-void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object);
-enum SSP_ERROR_CODE ssp_object_apply_texture(struct SSPObject *object, struct SSPTexture *texture);
-enum SSP_ERROR_CODE ssp_object_create_rectangle(struct SSPObject *object, struct SSPEngine *engine, vec2 pos, vec2 size, vec3 color);
+SSP_API enum SSP_ERROR_CODE ssp_object_update_texture_coordinates(struct SSPObject *object, struct SSPEngine *engine, vec2 *texture_coordinates);
+SSP_API enum SSP_ERROR_CODE spp_object_create(struct SSPObject *object, struct SSPEngine *engine, vec2 *vertices_pos, vec3 color, uint16_t *indices, uint32_t vertices_count);
+SSP_API void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object);
+SSP_API enum SSP_ERROR_CODE ssp_object_apply_texture(struct SSPObject *object, struct SSPTexture *texture);
+SSP_API enum SSP_ERROR_CODE ssp_object_create_rectangle(struct SSPObject *object, struct SSPEngine *engine, vec2 pos, vec2 size, vec3 color);
 
 #ifdef __cplusplus
     }

@@ -25,8 +25,8 @@ struct SSPCamera {
 };
 
 SSP_API enum SSP_ERROR_CODE ssp_camera_create(struct SSPCamera *camera);
-void ssp_camera_destroy(struct SSPCamera *camera);
-void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera);
+SSP_API void ssp_camera_destroy(struct SSPCamera *camera);
+SSP_API void ssp_camera_update(struct SSPEngine *pEngine, struct SSPCamera *camera);
 
 #ifdef __cplusplus
     }

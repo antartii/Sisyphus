@@ -26,8 +26,8 @@ struct SSPTexture {
     VkDeviceMemory image_memory;
 };
 
-enum SSP_ERROR_CODE spp_texture_create(struct SSPTexture *texture, struct SSPEngine *engine, const char *path);
-void ssp_texture_destroy(struct SSPEngine *engine, struct SSPTexture *texture);
+SSP_API enum SSP_ERROR_CODE spp_texture_create(struct SSPTexture *texture, struct SSPEngine *engine, const char *path);
+SSP_API void ssp_texture_destroy(struct SSPEngine *engine, struct SSPTexture *texture);
 
 #ifdef __cplusplus
     }
