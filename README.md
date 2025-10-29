@@ -1,11 +1,11 @@
 # Sisyphus
-C/C++ library for an engine using vulkan as it's graphic API and platform specific surfaces.
+C library for an engine using vulkan as it's graphic API and platform specific surfaces.
 It is the 5th iteration of a engine library created by [Anta](https://bsky.app/profile/traveler-anta.bsky.social) and hopefully the last one.
 
 ## Dependencies
 - **C99**
 - **CMake 3.12**
-- **Vulkan 1.2**
+- **Vulkan 1.1 SDK** (make sure the env variable $VULKAN_SDK is defined)
 - **libwayland**
 - **cglm**
 

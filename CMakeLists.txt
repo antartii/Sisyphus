@@ -19,7 +19,7 @@ set(ENGINE_NAME ${PROJECT_NAME})
 set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 
 # === Compiling shaders ===
-set(SLANGC "$ENV{HOME}/VulkanSDK/1.4.309.0/x86_64/bin/slangc")
+set(SLANGC "${VULKAN_SDK}/bin/slangc")
 set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/shaders.spv)
 if (DEPLOY)
     set(SHADERS_PATH "../share/shaders.spv")
@@ -48,11 +48,11 @@ add_custom_target(compile_shaders ALL
 )
 
 # === Options ===
-set(SURFACE "" CACHE STRING "Select your surface api" )
+set(SURFACE "" CACHE STRING "Select your surface api" "wayland")
 
 if ("${SURFACE}" STREQUAL "wayland")
     find_package(PkgConfig)
-    pkg_check_modules(PKG_WAYLAND wayland-client)
+    pkg_check_modules(PKG_WAYLAND wayland-client REQUIRED)
     find_path(SURFACE_INCLUDE_DIR NAMES "wayland-client.h" HINTS ${PKG_WAYLAND_INCLUDE_DIRS})
     find_library(SURFACE_LIBRARIES NAMES "wayland-client" HINTS ${PKG_WAYLAND_LIBRARY_DIRS})
 
