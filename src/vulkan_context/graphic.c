@@ -193,7 +193,8 @@ static VkShaderModule ssp_vulkan_create_shader_module(struct SSPVulkanContextExt
 enum SSP_ERROR_CODE ssp_vulkan_create_graphic_pipeline(struct SSPVulkanContextExtFunc *ext_func, struct SSPVulkanPipelineContext *pipeline_context, struct SSPVulkanDevice *device, struct SSPVulkanSwapchain *swapchain)
 {
     uint32_t code_size;
-    const char *shader_file = SSP_SHADERS_PATH;
+    char shader_file[PATH_MAX];
+    ssp_build_path(shader_file, PATH_MAX, SSP_SHADERS_PATH);
     char *shader_code = read_file(shader_file, &code_size);
 
     VkShaderModule shader_module = ssp_vulkan_create_shader_module(ext_func, device->logical_device, shader_code, code_size);

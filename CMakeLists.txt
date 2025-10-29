@@ -21,6 +21,11 @@ set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 # === Compiling shaders ===
 set(SLANGC "$ENV{HOME}/VulkanSDK/1.4.309.0/x86_64/bin/slangc")
 set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/shaders.spv)
+if (DEPLOY)
+    set(SHADERS_PATH "../share/shaders.spv")
+else()
+    set(SHADERS_PATH ${SHADER_OUTPUT})
+endif()
 set(DEPENDENCIES_OUTPUT ${CMAKE_BINARY_DIR}/lib)
 
 add_custom_command(
@@ -145,6 +150,8 @@ configure_file(cmake/sisyphus_config.h.in include/sisyphus_config.h)
 if (C_BUILD_STATIC)
     set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
+
+add_dependencies(${PROJECT_NAME} compile_shaders)
 
 # === Definitions ===
 if ("${SURFACE}" STREQUAL "wayland")

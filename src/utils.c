@@ -89,3 +89,22 @@ char *read_file(const char *file_name, uint32_t *buffer_size)
 
     return buffer;
 }
+
+char *ssp_get_executable_dir()
+{
+    static char path[PATH_MAX];
+    ssize_t len = readlink("/proc/self/exe", path, PATH_MAX - 1);
+    
+    if (len == -1)
+        return NULL;
+    
+    path[len] = '\0';
+    dirname(path);
+
+    return path;
+}
+
+void ssp_build_path(char *out, size_t size, const char *path)
+{
+    snprintf(out, size, "%s/%s", ssp_get_executable_dir(), path);
+}
