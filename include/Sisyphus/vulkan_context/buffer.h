@@ -1,10 +1,9 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
-#include "ext_func.h"
+#include <Sisyphus/errors.h>
 #include "utils.h"
-#include "shaders.h"
-#include "../utils.h"
+#include <Sisyphus/shaders.h>
 #include <unistd.h>
 
 #include "command_buffer.h"

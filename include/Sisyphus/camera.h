@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <cglm/cglm.h>
 
-#include "export.h"
+#include <Sisyphus/export.h>
 
 #ifdef __cplusplus
 extern "C" {

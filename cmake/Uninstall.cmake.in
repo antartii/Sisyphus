@@ -1,0 +1,17 @@
+message(STATUS "Running Sisyphus uninstall script...")
+
+if(NOT EXISTS "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
+    message(FATAL_ERROR "Cannot find install_manifest.txt, install the Sisyphus library first")
+endif()
+
+file(READ "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt" files)
+string(REGEX REPLACE "\n" ";" files "${files}")
+
+foreach(file ${files})
+    if(EXISTS "${file}")
+        message(STATUS "Removing ${file}")
+        execute_process(COMMAND "${CMAKE_COMMAND}" -E remove "${file}")
+    else()
+        message(STATUS "File not found: ${file}")
+    endif()
+endforeach()

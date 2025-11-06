@@ -4,17 +4,16 @@
 #include <cglm/cglm.h>
 #include <inttypes.h>
 
-#include "utils.h"
-#include "errors.h"
+#include <Sisyphus/utils.h>
+#include <Sisyphus/errors.h>
 #include "shaders.h"
-#include "sisyphus_config.h"
-#include "window.h"
+#include <sisyphus_config.h>
+#include <Sisyphus/window.h>
 #include "ext_func.h"
 #include "buffer.h"
 #include "instance.h"
 #include "debug.h"
 #include "surface.h"
-#include "device.h"
 #include "device.h"
 
 #include "swapchain.h"

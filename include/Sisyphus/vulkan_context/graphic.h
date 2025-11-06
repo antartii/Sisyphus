@@ -2,13 +2,13 @@
 
 #include <vulkan/vulkan.h>
 
-#include "errors.h"
+#include <Sisyphus/errors.h>
 #include "ext_func.h"
 #include "sisyphus_config.h"
 #include "shaders.h"
-#include "../utils.h"
+#include <Sisyphus/utils.h>
 #include "buffer.h"
-#include "../camera.h"
+#include <Sisyphus/camera.h>
 #include "swapchain.h"
 
 #ifdef __cplusplus

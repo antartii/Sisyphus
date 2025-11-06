@@ -4,11 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "errors.h"
+#include <Sisyphus/errors.h>
 #include "ext_func.h"
 #include "device.h"
 
-#include "../utils.h"
+#include <Sisyphus/utils.h>
 
 #ifdef __cplusplus
 extern "C" {

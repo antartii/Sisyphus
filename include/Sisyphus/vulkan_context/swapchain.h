@@ -2,9 +2,9 @@
 
 #include <vulkan/vulkan.h>
 
-#include "errors.h"
+#include <Sisyphus/errors.h>
 #include "ext_func.h"
-#include "window.h"
+#include <Sisyphus/window.h>
 #include "device.h"
 
 #ifdef __cplusplus

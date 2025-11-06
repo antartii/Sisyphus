@@ -3,8 +3,8 @@
 #include <vulkan/vulkan.h>
 #include <stdbool.h>
 
-#include "errors.h"
-#include "window.h"
+#include <Sisyphus/errors.h>
+#include <Sisyphus/window.h>
 #include "ext_func.h"
 #include "instance.h"
 

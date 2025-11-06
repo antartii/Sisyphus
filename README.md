@@ -6,8 +6,10 @@ It is the 5th iteration of a engine library created by [Anta](https://bsky.app/p
 - **C99**
 - **CMake 3.12**
 - **Vulkan 1.1 SDK** (make sure the env variable $VULKAN_SDK is defined)
-- **libwayland**
+- **pkgConfig**
 - **cglm**
+
+- **wayland-devel & wayland-protocols** (For wayland surface only)
 
 ## Compiling
 To compile the Sisyphus library manually you can configure the file then building the library at the root of the project

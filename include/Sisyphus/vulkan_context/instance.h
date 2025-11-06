@@ -1,8 +1,8 @@
 #pragma once
 
-#include "errors.h"
+#include <Sisyphus/errors.h>
 #include <vulkan/vulkan.h>
-#include "../utils.h"
+#include <Sisyphus/utils.h>
 #include "ext_func.h"
 #include "sisyphus_config.h"
 

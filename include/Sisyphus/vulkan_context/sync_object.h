@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "errors.h"
+#include <Sisyphus/errors.h>
 #include "graphic.h"
 #include "ext_func.h"
 #include "device.h"

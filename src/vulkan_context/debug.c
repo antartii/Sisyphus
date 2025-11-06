@@ -8,6 +8,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL ssp_vulkan_debug_callback(VkDebugUtilsMess
     return VK_FALSE;
 }
 
+#ifdef DEBUG
 enum SSP_ERROR_CODE ssp_vulkan_setup_debug_messenger(struct SSPVulkanContextExtFunc *ext_func, VkInstance instance, VkDebugUtilsMessengerEXT *debug_messenger)
 {
     VkDebugUtilsMessageSeverityFlagsEXT severity_flags = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
@@ -24,3 +25,4 @@ enum SSP_ERROR_CODE ssp_vulkan_setup_debug_messenger(struct SSPVulkanContextExtF
 
     return SSP_ERROR_CODE_SUCCESS;
 }
+#endif

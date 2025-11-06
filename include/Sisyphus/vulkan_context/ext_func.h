@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "errors.h"
+#include <Sisyphus/errors.h>
 
 #ifdef __cplusplus
 extern "C" {

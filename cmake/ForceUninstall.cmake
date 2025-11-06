@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.12)
+
+set(CMAKE_INSTALL_PREFIX "/usr/local")
+set(LIBS "lib64" "lib")
+set(FOUND FALSE)
+
+foreach(lib_dir IN LISTS LIBS)
+    set(INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/Sisyphus")
+    set(LIB_FILE    "${CMAKE_INSTALL_PREFIX}/${lib_dir}/libSisyphus.so")
+    set(LIB_FILE    "${CMAKE_INSTALL_PREFIX}/${lib_dir}/libSisyphus.a")
+    set(CMAKE_DIR   "${CMAKE_INSTALL_PREFIX}/${lib_dir}/cmake/Sisyphus")
+    set(CMAKE_DIR_SHARE   "${CMAKE_INSTALL_PREFIX}/share/cmake/Sisyphus")
+
+    if(EXISTS "${INCLUDE_DIR}" OR EXISTS "${LIB_FILE}" OR EXISTS "${CMAKE_DIR}" OR EXISTS ${CMAKE_DIR_SHARE})
+        message(STATUS "Uninstalling Sisyphus from ${lib_dir}")
+        execute_process(COMMAND "${CMAKE_COMMAND}" -E rm -rf "${INCLUDE_DIR}")
+        execute_process(COMMAND "${CMAKE_COMMAND}" -E rm -f  "${LIB_FILE}")
+        execute_process(COMMAND "${CMAKE_COMMAND}" -E rm -rf "${CMAKE_DIR}")
+        execute_process(COMMAND "${CMAKE_COMMAND}" -E rm -rf "${CMAKE_DIR_SHARE}")
+        set(FOUND TRUE)
+    endif()
+endforeach()
+
+if(NOT FOUND)
+    message(STATUS "No existing Sisyphus installation FOUND.")
+else()
+    message(STATUS "Old Sisyphus installation removed.")
+endif()
