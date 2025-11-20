@@ -4,6 +4,8 @@ enum SSP_ERROR_CODE ssp_window_create(struct SSPWindow *pWindow, struct SSPConfi
 {
     enum SSP_ERROR_CODE result = SSP_ERROR_CODE_SURFACE_INIT;
 
+    ssp_input_manager_init(&pWindow->input_manager);
+
     #ifdef VK_USE_PLATFORM_WAYLAND_KHR
     result = ssp_wayland_surface_init(pWindow, &pWindow->surface_context, config);
     #endif

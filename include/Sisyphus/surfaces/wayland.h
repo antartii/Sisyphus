@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <xkbcommon/xkbcommon.h>
+#include <sys/mman.h>
 
 #include "errors.h"
 #include "config.h"
@@ -29,6 +31,13 @@ struct SSPWaylandSurfaceContext {
     struct xdg_surface *xdg_surface;
     struct xdg_toplevel *xdg_toplevel;
     struct wl_event_queue *queue;
+
+    struct wl_seat *wl_seat;
+    struct wl_keyboard *wl_keyboard;
+
+    struct xkb_state *xkb_state;
+    struct xkb_context *xkb_context;
+    struct xkb_keymap *xkb_keymap;
 };
 
 enum SSP_ERROR_CODE ssp_wayland_surface_init(struct SSPWindow *window, struct SSPWaylandSurfaceContext *wayland_context, struct SSPConfig *config);

@@ -61,6 +61,7 @@ add_library(${PROJECT_NAME} ${C_LIB_TYPE}
     ${PROJECT_SOURCE_DIR}/src/utils.c
     ${PROJECT_SOURCE_DIR}/src/object.c
     ${PROJECT_SOURCE_DIR}/src/camera.c
+    ${PROJECT_SOURCE_DIR}/src/input_manager.c
 
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/vulkan_context.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/ext_func.c

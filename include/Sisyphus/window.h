@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "config.h"
+#include "input_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +22,8 @@ struct SSPWindow {
     #ifdef VK_USE_PLATFORM_WAYLAND_KHR
         struct SSPWaylandSurfaceContext surface_context;
     #endif
+
+    struct SSPInputManager input_manager;
 
     bool should_close;
     bool resize_needed;
