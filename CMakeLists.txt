@@ -77,6 +77,9 @@ add_library(${PROJECT_NAME} ${C_LIB_TYPE}
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/sync_object.c
     ${PROJECT_SOURCE_DIR}/src/vulkan_context/texture.c
 
+    ${PROJECT_SOURCE_DIR}/src/data_structures/indexed_linked_list.c
+    ${PROJECT_SOURCE_DIR}/src/data_structures/dynamic_array.c
+
     ${SURFACE_SRC}
 )
 
@@ -109,11 +112,9 @@ endif()
 
 # === Compiling shaders ===
 set(SLANGC "$ENV{VULKAN_SDK}/bin/slangc")
-set(SHADER_FILE shaders.spv)
-set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/${SHADER_FILE})
-if (NOT DEFINED SHADERS_PATH)
-    set(SHADERS_PATH shaders.spv)
-endif()
+set(SHADER_FILE "shaders.spv")
+set(SHADERS_PATH "${SHADERS_PREFIX}/shaders.spv")
+set(SHADER_OUTPUT ${CMAKE_BINARY_DIR}/${SHADERS_PATH})
 
 add_custom_command(
     OUTPUT ${SHADER_OUTPUT}

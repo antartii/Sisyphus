@@ -23,6 +23,7 @@ enum SSP_OBJECT_STATUS {
 struct SSPObject {
     uint32_t indices_count;
     uint32_t vertices_count;
+    uint16_t *indices;
     struct SSPShaderVertex *vertices;
 
     struct SSPShaderPushConstant push_constant;
@@ -31,6 +32,7 @@ struct SSPObject {
     struct SSPVulkanBuffer index_buffer;
 
     enum SSP_OBJECT_STATUS status;
+    vec3 color;
 
     bool is_textured;
     struct SSPTexture *texture;
@@ -41,6 +43,8 @@ SSP_API enum SSP_ERROR_CODE spp_object_create(struct SSPObject *object, struct S
 SSP_API void ssp_object_destroy(struct SSPEngine *engine, struct SSPObject *object);
 SSP_API enum SSP_ERROR_CODE ssp_object_apply_texture(struct SSPObject *object, struct SSPTexture *texture);
 SSP_API enum SSP_ERROR_CODE ssp_object_create_rectangle(struct SSPObject *object, struct SSPEngine *engine, vec2 pos, vec2 size, vec3 color);
+SSP_API enum SSP_ERROR_CODE ssp_object_add_point(struct SSPObject *object, struct SSPEngine *engine, vec2 pos, vec2 texture_coordinate);
+enum SSP_ERROR_CODE ssp_object_load(struct SSPObject *object, struct SSPEngine *engine);
 
 #ifdef __cplusplus
     }

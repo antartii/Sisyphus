@@ -1,4 +1,10 @@
 @PACKAGE_INIT@
 
+find_dependency(Vulkan REQUIRED)
+
+if ("${SURFACE}" STREQUAL "wayland")
+    find_dependency(Wayland REQUIRED)
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 check_required_components("@PROJECT_NAME@")
